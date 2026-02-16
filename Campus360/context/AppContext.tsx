@@ -7,6 +7,7 @@ const AppContext = createContext<any>(null);
 export function AppProvider({ children }) {
   const [role, setRole] = useState<Role>(null);
 
+
   const [eventState, setEventState] = useState({
     quizCompleted: false,
     priority: null as number | null,
