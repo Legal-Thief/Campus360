@@ -10,6 +10,9 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useApp } from '../../context/AppContext';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { loginUser, getCurrentUser } from '../../utils/api'
+
 
 /* 🎨 COLOR SYSTEM */
 const BLUE = '#2563EB';
@@ -36,10 +39,31 @@ export default function LoginScreen() {
   const showPasswordError = password.length > 0 && password.length < 6;
 
   // 🔐 LOGIN HANDLER (LOGIC ONLY)
-  const handleLogin = () => {
-    setRole('student'); // student / admin / warden / superadmin
-    router.replace('/(main)/dashboard');
-  };
+  const handleLogin = async () => {
+  try {
+    const data = await loginUser(email, password)
+
+    if (!data.success) {
+      alert(data.message)
+      return
+    }
+
+    // Save token
+    await AsyncStorage.setItem('token', data.token)
+
+    // Verify token
+    const userData = await getCurrentUser(data.token)
+
+    if (userData.success) {
+      router.replace('/(main)/dashboard')  // adjust route if needed
+    }
+
+  } catch (error) {
+    console.log(error)
+    alert('Login failed')
+  }
+}
+
 
   return (
     <ScrollView
