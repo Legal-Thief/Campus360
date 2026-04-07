@@ -6,6 +6,7 @@ const questionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     options: {
       type: [String],
       required: true,
@@ -16,6 +17,7 @@ const questionSchema = new mongoose.Schema(
         message: "Each question must have exactly 4 options",
       },
     },
+
     correctAnswerIndex: {
       type: Number,
       required: true,
@@ -31,20 +33,46 @@ const eventSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
-    description: String,
+
+    description: {
+      type: String,
+      default: "",
+    },
+
     venue: {
       type: String,
       required: true,
+      trim: true,
     },
+
+    auditoriumId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Auditorium",
+      required: true,
+    },
+
     date: {
       type: Date,
       required: true,
     },
+
     registrationDeadline: {
       type: Date,
       required: true,
     },
+
+    bookingStart: {
+      type: Date,
+      default: null,
+    },
+
+    bookingEnd: {
+      type: Date,
+      default: null,
+    },
+
     status: {
       type: String,
       enum: [
@@ -56,14 +84,23 @@ const eventSchema = new mongoose.Schema(
       ],
       default: "registration_open",
     },
+
     quiz: {
       duration: {
         type: Number,
         required: true,
+        min: 1,
       },
+
       questions: {
         type: [questionSchema],
         required: true,
+        validate: {
+          validator: function (arr) {
+            return arr.length > 0;
+          },
+          message: "At least one question is required",
+        },
       },
     },
   },

@@ -22,6 +22,19 @@ const quizAttemptSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    // 🔥 ADD THESE BELOW
+    priority: {
+      type: Number,
+    },
+
+    slotStart: {
+      type: Date,
+    },
+
+    slotEnd: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );
