@@ -1,10 +1,37 @@
-import { Stack } from "expo-router";
-import { AuthProvider } from "../context/AuthContext";
+import { Stack, useRouter } from "expo-router";
+import { AuthProvider, useAuth } from "../context/AuthContext";
+import { useEffect } from "react";
+
+function RootNavigator() {
+  const { user, token, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (!token) {
+      router.replace("/(auth)/login");
+      return;
+    }
+
+    const role = user?.role;
+
+    if (role === "warden") {
+      router.replace("/(warden)/dashboard");
+    } else if (role === "admin" || role === "superadmin") {
+      router.replace("/(admin)/dashboard");
+    } else {
+      router.replace("/(core)/student-dashboard");
+    }
+  }, [loading, token, user?.role]);
+
+  return <Stack screenOptions={{ headerShown: false }} />;
+}
 
 export default function Layout() {
   return (
     <AuthProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <RootNavigator />
     </AuthProvider>
   );
 }

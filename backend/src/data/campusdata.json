@@ -1,0 +1,466 @@
+{
+  "startPoint": "cu_bridge",
+  "locations": {
+    "cu_bridge": {
+      "name": "CU Bridge",
+      "image": "bridge.jpg",
+      "routes": {
+        "information_center_stairs": {
+          "next": "information_center_stairs",
+          "instruction": "Go 30 steps straight"
+        },
+        "academic_block": {
+          "next": "academic_block",
+          "instruction": "Go 30 steps straight"
+        },
+        "main_intersection": {
+          "next": "main_intersection",
+          "instruction": "Go 50 steps straight"
+        }
+      }
+    },
+
+    "information_center_stairs": {
+      "name": "Information Center Stairs",
+      "image": "information.jpg",
+      "routes": {
+        "pithvi_hall": {
+          "next": "pithvi_hall",
+          "instruction": "Turn right and go right to reach ground floor Pithvi Hall"
+        },
+        "account_office": {
+          "next": "account_office",
+          "instruction": "Turn right and then turn left to reach ground floor Account Office"
+        }
+      }
+    },
+
+    "pithvi_hall": {
+      "name": "Pithvi Hall",
+      "image": "prithvi.jpg",
+      "routes": {
+        "information_center": {
+          "next": "information_center",
+          "instruction": "Go to first floor for Information Center"
+        }
+      }
+    },
+
+    "information_center": {
+      "name": "Information Center",
+      "image": "information.jpg",
+      "routes": {
+        "chancellor_secretariat": {
+          "next": "chancellor_secretariat",
+          "instruction": "From Information Center you can access Chancellor Secretariat"
+        },
+        "examination_department": {
+          "next": "examination_department",
+          "instruction": "Go to second floor for Examination Department"
+        }
+      }
+    },
+
+    "chancellor_secretariat": {
+      "name": "Chancellor Secretariat",
+      "image": "information.jpg",
+      "routes": {}
+    },
+
+    "examination_department": {
+      "name": "Examination Department",
+      "image": "information.jpg",
+      "routes": {}
+    },
+
+    "account_office": {
+      "name": "Account Office",
+      "image": "account.jpg",
+      "routes": {
+        "information_center": {
+          "next": "information_center",
+          "instruction": "Go to first floor for Information Center"
+        },
+        "career_advancement_services": {
+          "next": "career_advancement_services",
+          "instruction": "Go to first floor for Career Advancement Services"
+        },
+        "tagore_library": {
+          "next": "tagore_library",
+          "instruction": "Go to second floor for Tagore Library"
+        }
+      }
+    },
+
+    "career_advancement_services": {
+      "name": "Career Advancement Services",
+      "image": "information.jpg",
+      "routes": {}
+    },
+
+    "tagore_library": {
+      "name": "Tagore Library",
+      "image": "tagore.jpg",
+      "routes": {
+        "reading_hall": {
+          "next": "reading_hall",
+          "instruction": "Go to fourth floor for Reading Hall"
+        }
+      }
+    },
+
+    "reading_hall": {
+      "name": "Reading Hall",
+      "image": "library.jpg",
+      "routes": {}
+    },
+
+    "academic_block": {
+      "name": "Academic Block",
+      "image": "academic.jpg",
+      "routes": {
+        "ramanujan_block": {
+          "next": "ramanujan_block",
+          "instruction": "Turn left and then turn right to reach Ramanujan Block"
+        },
+        "cvr_block": {
+          "next": "cvr_block",
+          "instruction": "Turn left and then turn right to reach CVR Block"
+        }
+      }
+    },
+
+    "ramanujan_block": {
+      "name": "Ramanujan Block",
+      "image": "academic.jpg",
+      "routes": {
+        "international_affairs": {
+          "next": "international_affairs",
+          "instruction": "Go to ground floor for Office of International Affairs"
+        },
+        "chenab_hall": {
+          "next": "chenab_hall",
+          "instruction": "Go to ground floor for Chenab Hall"
+        }
+      }
+    },
+
+    "international_affairs": {
+      "name": "Office of International Affairs",
+      "image": "international.jpg",
+      "routes": {}
+    },
+
+    "chenab_hall": {
+      "name": "Chenab Hall",
+      "image": "chenab.jpg",
+      "routes": {
+        "tuck_shop": {
+          "next": "tuck_shop",
+          "instruction": "Go 30 steps forward from Chenab Hall to reach Tuck Shop"
+        }
+      }
+    },
+
+    "tuck_shop": {
+      "name": "Tuck Shop",
+      "image": "tuckshop.jpg",
+      "routes": {
+        "makers_lab": {
+          "next": "makers_lab",
+          "instruction": "Opposite to Tuck Shop you will find Makers Lab (RJ009)"
+        }
+      }
+    },
+
+    "makers_lab": {
+      "name": "Makers Lab (RJ009)",
+      "image": "kalam.jpg",
+      "routes": {
+        "ramanujan_first_floor": {
+          "next": "ramanujan_first_floor",
+          "instruction": "Go to first floor for classes"
+        },
+        "ramanujan_second_floor": {
+          "next": "ramanujan_second_floor",
+          "instruction": "Go to second floor for classes"
+        }
+      }
+    },
+
+    "ramanujan_first_floor": {
+      "name": "Ramanujan Block First Floor Classes",
+      "image": "academic.jpg",
+      "routes": {}
+    },
+
+    "ramanujan_second_floor": {
+      "name": "Ramanujan Block Second Floor Classes",
+      "image": "academic.jpg",
+      "routes": {}
+    },
+
+    "cvr_block": {
+      "name": "CVR Block",
+      "image": "academic.jpg",
+      "routes": {
+        "shivalik_hall": {
+          "next": "shivalik_hall",
+          "instruction": "Go to ground floor for Shivalik Hall"
+        }
+      }
+    },
+
+    "shivalik_hall": {
+      "name": "Shivalik Hall",
+      "image": "shivalik.jpg",
+      "routes": {
+        "cvr_first_floor": {
+          "next": "cvr_first_floor",
+          "instruction": "Go to first floor for classes"
+        },
+        "cvr_second_floor": {
+          "next": "cvr_second_floor",
+          "instruction": "Go to second floor for classes"
+        }
+      }
+    },
+
+    "cvr_first_floor": {
+      "name": "CVR First Floor Classes",
+      "image": "academic.jpg",
+      "routes": {}
+    },
+
+    "cvr_second_floor": {
+      "name": "CVR Second Floor Classes",
+      "image": "academic.jpg",
+      "routes": {}
+    },
+
+    "main_intersection": {
+      "name": "Main Intersection",
+      "image": "intersction1.jpg",
+      "routes": {
+        "florence_hall": {
+          "next": "florence_hall",
+          "instruction": "Go 20 steps straight, Florence Hall is on the right"
+        },
+        "girls_hostel_auditorium": {
+          "next": "girls_hostel_auditorium",
+          "instruction": "Turn left for Girls Hostel and Auditorium"
+        },
+        "square_one": {
+          "next": "square_one",
+          "instruction": "Turn right for Square One"
+        },
+        "kalpana_hostel": {
+          "next": "kalpana_hostel",
+          "instruction": "Go 50 steps straight to reach Kalpana Girls Hostel"
+        },
+        "himalayan_harmony": {
+          "next": "himalayan_harmony",
+          "instruction": "Go 60 steps straight to reach Himalayan Harmony Theatre"
+        }
+      }
+    },
+
+    "florence_hall": {
+      "name": "Florence Hall",
+      "image": "Mars.jpg",
+      "routes": {}
+    },
+
+    "girls_hostel_auditorium": {
+      "name": "Girls Hostel and Auditorium Area",
+      "image": "auditorium.jpg",
+      "routes": {
+        "beta_zone": {
+          "next": "beta_zone",
+          "instruction": "Go 10 steps further and turn right for Beta Zone"
+        }
+      }
+    },
+
+    "beta_zone": {
+      "name": "Beta Zone",
+      "image": "beta.jpg",
+      "routes": {
+        "explore_hub": {
+          "next": "explore_hub",
+          "instruction": "Go 10 steps further and turn right again for Explore Hub"
+        }
+      }
+    },
+
+    "explore_hub": {
+      "name": "Explore Hub",
+      "image": "explorehub.jpg",
+      "routes": {
+        "salon": {
+          "next": "salon",
+          "instruction": "From Explore Hub go 10 steps further to reach Salon"
+        }
+      }
+    },
+
+    "salon": {
+      "name": "Salon",
+      "image": "salon.jpg",
+      "routes": {}
+    },
+
+    "kalpana_hostel": {
+      "name": "Kalpana Girls Hostel",
+      "image": "kalpana.jpg",
+      "routes": {}
+    },
+
+    "himalayan_harmony": {
+      "name": "Himalayan Harmony Theatre",
+      "image": "auditorium.jpg",
+      "routes": {
+        "chai_nagri": {
+          "next": "chai_nagri",
+          "instruction": "Opposite to Himalayan Harmony Theatre you will find Chai Nagri"
+        },
+        "gamma_zone": {
+          "next": "gamma_zone",
+          "instruction": "Opposite to Himalayan Harmony Theatre you will find Gamma Zone"
+        },
+        "girls_mess": {
+          "next": "girls_mess",
+          "instruction": "Go 25 steps straight to reach Teresa, Gargi Hostels and Girls Mess"
+        }
+      }
+    },
+
+    "chai_nagri": {
+      "name": "Chai Nagri",
+      "image": "chainagri.jpg",
+      "routes": {}
+    },
+
+    "gamma_zone": {
+      "name": "Gamma Zone",
+      "image": "gamma.jpg",
+      "routes": {}
+    },
+
+    "girls_mess": {
+      "name": "Girls Mess",
+      "image": "girlsmess.jpg",
+      "routes": {}
+    },
+
+    "square_one": {
+      "name": "Square One",
+      "image": "SquareOne.jpg",
+      "routes": {
+        "nursing_block": {
+          "next": "nursing_block",
+          "instruction": "Go 5 steps straight to reach Nursing Block"
+        },
+        "resto_u": {
+          "next": "resto_u",
+          "instruction": "Go 7 steps straight to reach Resto-U"
+        },
+        "boys_mess": {
+          "next": "boys_mess",
+          "instruction": "Opposite to Square One you will find Boys Mess"
+        },
+        "bose_girls_hostel": {
+          "next": "bose_girls_hostel",
+          "instruction": "Go 50 steps straight from Nursing Block to reach Bose Girls Hostel"
+        }
+      }
+    },
+
+    "nursing_block": {
+      "name": "Nursing Block",
+      "image": "Nursing.jpg",
+      "routes": {}
+    },
+
+    "resto_u": {
+      "name": "Resto-U",
+      "image": "restoU.jpg",
+      "routes": {}
+    },
+
+    "boys_mess": {
+      "name": "Boys Mess",
+      "image": "Bose.jpg",
+      "routes": {}
+    },
+
+    "bose_girls_hostel": {
+      "name": "Bose Girls Hostel",
+      "image": "Bose.jpg",
+      "routes": {
+        "bose_boys_hostel": {
+          "next": "bose_boys_hostel",
+          "instruction": "Go 10 steps straight to reach Bose Boys Hostel"
+        },
+        "alpha_zone": {
+          "next": "alpha_zone",
+          "instruction": "Opposite to Bose Hostel you will find Alpha Zone"
+        }
+      }
+    },
+
+    "bose_boys_hostel": {
+      "name": "Bose Boys Hostel",
+      "image": "Bose.jpg",
+      "routes": {
+        "hostel_left_turn": {
+          "next": "hostel_left_turn",
+          "instruction": "Go 30 steps straight and turn left"
+        }
+      }
+    },
+
+    "hostel_left_turn": {
+      "name": "Hostel Area Turn",
+      "image": "Bose.jpg",
+      "routes": {
+        "chanakya_hostel": {
+          "next": "chanakya_hostel",
+          "instruction": "You will reach Chanakya Hostel"
+        },
+        "aryabhatta_hostel": {
+          "next": "aryabhatta_hostel",
+          "instruction": "You will reach Aryabhatta Hostel"
+        },
+        "sarabhai_hostel": {
+          "next": "sarabhai_hostel",
+          "instruction": "You will reach Sarabhai Boys Hostel"
+        }
+      }
+    },
+
+    "chanakya_hostel": {
+      "name": "Chanakya Hostel",
+      "image": "Chanakya.jpg",
+      "routes": {}
+    },
+
+    "aryabhatta_hostel": {
+      "name": "Aryabhatta Hostel",
+      "image": "Aryabhatta.jpg",
+      "routes": {}
+    },
+
+    "sarabhai_hostel": {
+      "name": "Sarabhai Boys Hostel",
+      "image": "sarabhai.jpg",
+      "routes": {}
+    },
+
+    "alpha_zone": {
+      "name": "Alpha Zone",
+      "image": "bridge.jpg",
+      "routes": {}
+    }
+  }
+}

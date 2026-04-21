@@ -1,16 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 
 type User = {
   id: string;
   name: string;
   email: string;
-  role: "student" | "admin" | "faculty" | "warden";
+  role: "student" | "admin" | "superadmin" | "faculty" | "warden";
 };
 
 type AuthContextType = {
   user: User | null;
+  token: string | null;
   loading: boolean;
   login: (token: string, user: User) => Promise<void>;
   logout: () => Promise<void>;
@@ -20,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,48 +28,40 @@ export const AuthProvider = ({ children }: any) => {
   }, []);
 
   const loadUser = async () => {
-    const storedUser = await AsyncStorage.getItem("user");
+    try {
+      const [storedUser, storedToken] = await Promise.all([
+        AsyncStorage.getItem("user"),
+        AsyncStorage.getItem("token"),
+      ]);
 
-    if (storedUser) {
-      const parsed = JSON.parse(storedUser);
-      setUser(parsed);
-
-      if (parsed.role === "admin") {
-        router.replace("/(admin)/dashboard");
-      } else {
-        router.replace("/(core)/student-dashboard");
+      if (storedUser && storedToken) {
+        setUser(JSON.parse(storedUser));
+        setToken(storedToken);
       }
-    } else {
-      router.replace("/(auth)/login");
+    } catch (e) {
+      console.error("Failed to load auth state", e);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const login = async (token: string, user: User) => {
     await AsyncStorage.setItem("token", token);
     await AsyncStorage.setItem("user", JSON.stringify(user));
-
+    setToken(token);
     setUser(user);
-
-    if (user.role === "admin") {
-      router.replace("/(admin)/dashboard");
-    } else {
-      router.replace("/(core)/student-dashboard");
-    }
+    // ✅ No router.replace() here — let RootNavigator handle routing
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem("token");
-    await AsyncStorage.removeItem("user");
-
+    await AsyncStorage.multiRemove(["token", "user"]);
+    setToken(null);
     setUser(null);
-
-    router.replace("/(auth)/login");
+    // ✅ No router.replace() here — let RootNavigator handle routing
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
