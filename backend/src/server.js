@@ -13,7 +13,8 @@ import eventRoutes from "./routes/event.routes.js";
 import auditoriumRoutes from "./routes/auditorium.routes.js";
 import hostelRoutes from "./routes/hostel.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-import chatRoutes from "./routes/chat.routes.js"; // Campus navigation chatbot
+import chatRoutes from "./routes/chat.routes.js";
+import lostFoundRoutes from "./routes/lostFound.routes.js";
 
 dotenv.config();
 connectDB();
@@ -91,8 +92,8 @@ app.use("/api/events",      eventRoutes);
 app.use("/api/auditoriums", auditoriumRoutes);
 app.use("/api/hostel",      hostelRoutes);
 app.use("/api/admin",       adminRoutes);
-app.use("/api",             chatRoutes);   // POST /api/chat — campus navigator
-
+app.use("/api",             chatRoutes);  
+app.use("/api/lost-found", lostFoundRoutes);
 // ── Health check ───────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
   res.send("Campus360 Backend Running ✓");
@@ -106,6 +107,7 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
+
 
 // ── Start server ───────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;

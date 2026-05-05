@@ -1,242 +1,340 @@
 import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
+  View, Text, StyleSheet, TouchableOpacity,
+  FlatList, StatusBar, Dimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { COLORS, RADIUS } from "../../utils/theme";
-import { useAuth } from "../../context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "../../context/AuthContext";
+import { COLORS, FONT, RADIUS } from "../../utils/theme";
+
+const { width } = Dimensions.get("window");
 
 type Module = {
   title: string;
   subtitle: string;
   route: string;
   icon: string;
-  color: string;
+  tag: string;
   show: boolean;
 };
 
 export default function StudentDashboard() {
   const router = useRouter();
   const { user, logout } = useAuth();
-
   const isHosteller = user?.residentType === "hosteller";
 
   const modules: Module[] = [
     {
       title: "Event Registration",
-      subtitle: "Quiz-based seat booking for events",
+      subtitle: "Quiz-based seat booking",
       route: "/(core)/events",
-      icon: "calendar-outline",
-      color: "#6366f1",
+      icon: "calendar",
+      tag: "LIVE",
       show: true,
     },
     {
       title: "Hostel Management",
       subtitle: "Room change & swap requests",
       route: "/(core)/hostel",
-      icon: "business-outline",
-      color: "#10b981",
+      icon: "business",
+      tag: "ROOM",
       show: isHosteller,
     },
     {
       title: "Lost & Found",
-      subtitle: "Report or recover lost items",
+      subtitle: "Report or recover items",
       route: "/(core)/lost-found",
-      icon: "search-outline",
-      color: "#f59e0b",
+      icon: "search",
+      tag: "NEW",
       show: true,
     },
     {
       title: "Campus Navigator",
-      subtitle: "Get directions anywhere on campus",
+      subtitle: "Step-by-step directions",
       route: "/(core)/chatbot",
-      icon: "map-outline",
-      color: "#06b6d4",
+      icon: "map",
+      tag: "AI",
       show: true,
     },
   ].filter((m) => m.show);
 
+  const initials = user?.name
+    ? user.name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)
+    : "??";
+
   return (
     <View style={styles.container}>
-      {/* Header */}
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+
+      {/* BG accent */}
+      <View style={styles.bgAccent} />
+
+      {/* ── Header ── */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.welcome}>Welcome back,</Text>
-          <Text style={styles.name}>{user?.name}</Text>
-          <View style={styles.badgeRow}>
-            <View style={styles.roleBadge}>
-              <Text style={styles.roleText}>{user?.role?.toUpperCase()}</Text>
-            </View>
-            <View
-              style={[
-                styles.residentBadge,
-                isHosteller
-                  ? styles.residentBadgeHostel
-                  : styles.residentBadgeDay,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.residentText,
-                  isHosteller ? { color: "#10b981" } : { color: "#6366f1" },
-                ]}
-              >
-                {isHosteller ? "🏢 Hosteller" : "🏠 Day Scholar"}
-              </Text>
-            </View>
+        <View style={styles.headerLeft}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initials}</Text>
           </View>
-          {isHosteller && user?.hostelBlock && (
-            <Text style={styles.roomInfo}>
-              {user.hostelBlock} · Room {user.roomNumber}
-            </Text>
-          )}
+          <View>
+            <Text style={styles.greeting}>Good day,</Text>
+            <Text style={styles.userName} numberOfLines={1}>{user?.name?.split(" ")[0]}</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
+          <Ionicons name="log-out-outline" size={18} color={COLORS.primary} />
+        </TouchableOpacity>
+      </View>
+
+      {/* ── ID Badge ── */}
+      <View style={styles.idBadge}>
+        <View style={styles.idLeft}>
+          <View style={styles.redDot} />
+          <View>
+            <Text style={styles.idLabel}>STUDENT ID</Text>
+            <Text style={styles.idValue}>{user?.studentId || "—"}</Text>
+          </View>
+        </View>
+        <View style={[styles.rolePill, isHosteller && styles.rolePillHostel]}>
+          <Text style={styles.rolePillText}>
+            {isHosteller ? "HOSTELLER" : "DAY SCHOLAR"}
+          </Text>
         </View>
       </View>
 
-      {/* Module grid */}
+      {isHosteller && user?.hostelBlock && (
+        <View style={styles.roomBadge}>
+          <Ionicons name="bed-outline" size={13} color={COLORS.primary} />
+          <Text style={styles.roomBadgeText}>{user.hostelBlock}  ·  Room {user.roomNumber}</Text>
+        </View>
+      )}
+
+      {/* ── Section title ── */}
+      <View style={styles.sectionRow}>
+        <Text style={styles.sectionTitle}>MODULES</Text>
+        <View style={styles.sectionLine} />
+      </View>
+
+      {/* ── Module grid ── */}
       <FlatList
         data={modules}
         keyExtractor={(item) => item.title}
         numColumns={2}
         columnWrapperStyle={{ justifyContent: "space-between" }}
+        contentContainerStyle={{ gap: 12, paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <TouchableOpacity
-            style={styles.cardWrapper}
+            style={[styles.card, index === 0 && styles.cardFeatured]}
             onPress={() => router.push(item.route as any)}
             activeOpacity={0.8}
           >
-            <View style={styles.card}>
-              <View
-                style={[
-                  styles.iconBox,
-                  { backgroundColor: item.color + "18" },
-                ]}
-              >
-                <Ionicons name={item.icon as any} size={24} color={item.color} />
-              </View>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
+            {/* Tag */}
+            <View style={[styles.tag, index === 0 && styles.tagFeatured]}>
+              <Text style={[styles.tagText, index === 0 && styles.tagTextFeatured]}>{item.tag}</Text>
+            </View>
+
+            {/* Icon */}
+            <View style={[styles.iconBox, index === 0 && styles.iconBoxFeatured]}>
+              <Ionicons
+                name={item.icon as any}
+                size={22}
+                color={index === 0 ? "#fff" : COLORS.primary}
+              />
+            </View>
+
+            <Text style={[styles.cardTitle, index === 0 && styles.cardTitleFeatured]}>
+              {item.title}
+            </Text>
+            <Text style={[styles.cardSubtitle, index === 0 && styles.cardSubtitleFeatured]}>
+              {item.subtitle}
+            </Text>
+
+            {/* Arrow */}
+            <View style={styles.cardArrow}>
+              <Ionicons
+                name="arrow-forward"
+                size={14}
+                color={index === 0 ? "rgba(255,255,255,0.6)" : COLORS.textDim}
+              />
             </View>
           </TouchableOpacity>
         )}
       />
-
-      {/* Logout */}
-      <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-        <Ionicons name="log-out-outline" size={16} color={COLORS.danger} />
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
     </View>
   );
 }
+
+const CARD_W = (width - 52) / 2;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
     paddingHorizontal: 20,
-    paddingTop: 70,
+    paddingTop: 60,
   },
-  header: { marginBottom: 30 },
-  welcome: {
-    color: COLORS.textMuted,
-    fontFamily: "DMSans_400Regular",
-    fontSize: 14,
-  },
-  name: {
-    color: COLORS.textPrimary,
-    fontFamily: "DMSans_800ExtraBold",
-    fontSize: 28,
-    marginTop: 4,
-  },
-  badgeRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginTop: 12,
-    flexWrap: "wrap",
-  },
-  roleBadge: {
+  bgAccent: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: 120,
+    height: 3,
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: RADIUS.chip,
   },
-  roleText: {
-    color: "#fff",
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 11,
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
-  residentBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: RADIUS.chip,
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  avatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: COLORS.primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  avatarText: { color: "#fff", fontSize: 17, fontFamily: FONT.bold },
+  greeting: { color: COLORS.textMuted, fontSize: 12, fontFamily: FONT.regular },
+  userName: {
+    color: COLORS.textPrimary,
+    fontSize: 20,
+    fontFamily: FONT.extraBold,
+    maxWidth: 180,
+  },
+  logoutBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 1,
+    borderColor: COLORS.primaryBorder,
+    backgroundColor: COLORS.primaryGlow,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  residentBadgeHostel: {
-    backgroundColor: "rgba(16,185,129,0.1)",
-    borderColor: "rgba(16,185,129,0.3)",
-  },
-  residentBadgeDay: {
-    backgroundColor: "rgba(99,102,241,0.1)",
-    borderColor: "rgba(99,102,241,0.3)",
-  },
-  residentText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 11,
-  },
-  roomInfo: {
-    color: "#10b981",
-    fontFamily: "DMSans_500Medium",
-    fontSize: 12,
-    marginTop: 8,
-  },
-  cardWrapper: { width: "48%", marginBottom: 18 },
-  card: {
-    backgroundColor: "#111827",
-    borderRadius: RADIUS.card,
+  idBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
     borderColor: COLORS.border,
-    padding: 18,
-    minHeight: 140,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 10,
+  },
+  idLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
+  redDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
+  },
+  idLabel: {
+    color: COLORS.textMuted,
+    fontSize: 10,
+    fontFamily: FONT.bold,
+    letterSpacing: 2,
+    marginBottom: 2,
+  },
+  idValue: { color: COLORS.textPrimary, fontSize: 15, fontFamily: FONT.bold },
+  rolePill: {
+    backgroundColor: COLORS.white20,
+    borderRadius: RADIUS.chip,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  rolePillHostel: {
+    backgroundColor: COLORS.primaryGlow,
+    borderColor: COLORS.primaryBorder,
+  },
+  rolePillText: { color: COLORS.textMuted, fontSize: 10, fontFamily: FONT.bold, letterSpacing: 1 },
+  roomBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    marginBottom: 20,
+    paddingHorizontal: 4,
+  },
+  roomBadgeText: { color: COLORS.primary, fontSize: 12, fontFamily: FONT.medium },
+  sectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 16,
+    marginTop: 4,
+  },
+  sectionTitle: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+    fontFamily: FONT.bold,
+    letterSpacing: 3,
+  },
+  sectionLine: { flex: 1, height: 1, backgroundColor: COLORS.border },
+  card: {
+    width: CARD_W,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 16,
+    minHeight: 160,
     justifyContent: "space-between",
   },
+  cardFeatured: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  tag: {
+    alignSelf: "flex-start",
+    backgroundColor: COLORS.white20,
+    borderRadius: RADIUS.chip,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  tagFeatured: {
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+  tagText: { color: COLORS.textMuted, fontSize: 9, fontFamily: FONT.bold, letterSpacing: 1.5 },
+  tagTextFeatured: { color: "rgba(255,255,255,0.8)" },
   iconBox: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    alignItems: "center",
+    backgroundColor: COLORS.primaryGlow,
+    borderWidth: 1,
+    borderColor: COLORS.primaryBorder,
     justifyContent: "center",
+    alignItems: "center",
     marginBottom: 12,
+  },
+  iconBoxFeatured: {
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderColor: "rgba(255,255,255,0.2)",
   },
   cardTitle: {
     color: COLORS.textPrimary,
-    fontFamily: "DMSans_700Bold",
-    fontSize: 15,
+    fontSize: 14,
+    fontFamily: FONT.bold,
+    marginBottom: 4,
   },
+  cardTitleFeatured: { color: "#fff" },
   cardSubtitle: {
     color: COLORS.textMuted,
-    fontFamily: "DMSans_400Regular",
-    fontSize: 12,
-    marginTop: 4,
-    lineHeight: 17,
+    fontSize: 11,
+    fontFamily: FONT.regular,
+    lineHeight: 16,
   },
-  logoutBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  logoutText: {
-    color: COLORS.danger,
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 14,
-  },
+  cardSubtitleFeatured: { color: "rgba(255,255,255,0.7)" },
+  cardArrow: { alignSelf: "flex-end", marginTop: 8 },
 });
