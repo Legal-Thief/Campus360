@@ -8,27 +8,25 @@ export default function CoreLayout() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#111827",
+          backgroundColor: "#0D0D0D",
           borderTopColor: COLORS.border,
           borderTopWidth: 1,
-          height: 70,
+          height: 68,
           paddingBottom: 10,
+          paddingTop: 6,
         },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textDim,
-        tabBarLabelStyle: {
-          fontSize: 11,
-        },
-        tabBarIcon: ({ color }) => {
-          const iconMap: Record<string, string> = {
+        tabBarLabelStyle: { fontSize: 10, fontFamily: "DMSans_600SemiBold" },
+        tabBarIcon: ({ color, size }) => {
+          const icons: Record<string, string> = {
             "student-dashboard": "home-outline",
-            "events": "calendar-outline",
-            "hostel": "business-outline",
-            "chatbot": "map-outline",
-            "profile": "person-outline",
+            events: "calendar-outline",
+            hostel: "business-outline",
+            chatbot: "map-outline",
+            profile: "person-outline",
           };
-          const iconName = (iconMap[route.name] || "ellipse-outline") as any;
-          return <Ionicons name={iconName} size={22} color={color} />;
+          return <Ionicons name={(icons[route.name] || "ellipse-outline") as any} size={22} color={color} />;
         },
       })}
     >
@@ -37,8 +35,6 @@ export default function CoreLayout() {
       <Tabs.Screen name="hostel" options={{ title: "Hostel" }} />
       <Tabs.Screen name="chatbot" options={{ title: "Navigate" }} />
       <Tabs.Screen name="profile" options={{ title: "Profile" }} />
-
-      {/* Hidden screens — they exist in the route group but not shown as tabs */}
       <Tabs.Screen name="lost-found" options={{ href: null }} />
       <Tabs.Screen name="result/[id]" options={{ href: null }} />
       <Tabs.Screen name="seat-booking/[id]" options={{ href: null }} />

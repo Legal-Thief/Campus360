@@ -1,98 +1,55 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../context/AuthContext";
-import { COLORS, RADIUS } from "../../utils/theme";
-import API from "../../utils/api";
+import { COLORS, FONT, RADIUS } from "../../utils/theme";
 
 export default function Profile() {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
-    try {
-      const res = await API.get("/events");
-      setEvents(res.data.events || []);
-    } catch {
-      // silent — profile still works without event list
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((w: string) => w[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "?";
+    ? user.name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)
+    : "??";
 
-  const roleColors: Record<string, string> = {
-    student: "#6366f1",
-    admin: "#10b981",
-    superadmin: "#f59e0b",
-    warden: "#ef4444",
-    faculty: "#3b82f6",
+  const roleColor: Record<string, string> = {
+    student: COLORS.primary, admin: COLORS.success,
+    superadmin: COLORS.warning, warden: "#8B5CF6", faculty: COLORS.info,
   };
-
-  const roleColor = roleColors[user?.role || "student"] || "#6366f1";
+  const rc = roleColor[user?.role || "student"] || COLORS.primary;
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Avatar + name */}
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <StatusBar barStyle="light-content" />
+      <View style={styles.topAccent} />
+
+      {/* Avatar */}
       <View style={styles.avatarSection}>
-        <View style={[styles.avatar, { backgroundColor: roleColor + "22" }]}>
-          <Text style={[styles.avatarText, { color: roleColor }]}>{initials}</Text>
+        <View style={[styles.avatarRing, { borderColor: rc }]}>
+          <View style={[styles.avatar, { backgroundColor: rc + "22" }]}>
+            <Text style={[styles.avatarText, { color: rc }]}>{initials}</Text>
+          </View>
         </View>
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.email}>{user?.email}</Text>
-        <View style={[styles.roleBadge, { backgroundColor: roleColor + "18" }]}>
-          <Text style={[styles.roleText, { color: roleColor }]}>
-            {user?.role?.toUpperCase()}
-          </Text>
+        <View style={[styles.roleBadge, { backgroundColor: rc + "18", borderColor: rc + "44" }]}>
+          <Text style={[styles.roleText, { color: rc }]}>{user?.role?.toUpperCase()}</Text>
         </View>
       </View>
 
-      {/* Account info */}
-      <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>Account Info</Text>
+      {/* Info card */}
+      <View style={styles.card}>
+        <Text style={styles.cardLabel}>ACCOUNT INFO</Text>
         {[
-          { label: "Full name", value: user?.name, icon: "person-outline" },
-          { label: "Email", value: user?.email, icon: "mail-outline" },
-          {
-            label: "Student ID",
-            value: user?.studentId || "—",
-            icon: "id-card-outline",
-          },
-          { label: "Role", value: user?.role, icon: "shield-outline" },
-        ].map((row) => (
-          <View key={row.label} style={styles.infoRow}>
-            <Ionicons
-              name={row.icon as any}
-              size={16}
-              color={COLORS.textMuted}
-              style={{ width: 22 }}
-            />
+          { icon: "person-outline", label: "Full Name", value: user?.name },
+          { icon: "mail-outline", label: "Email", value: user?.email },
+          { icon: "id-card-outline", label: "Student ID", value: user?.studentId || "—" },
+          { icon: "shield-outline", label: "Role", value: user?.role },
+          { icon: "home-outline", label: "Resident Type", value: user?.residentType?.replace("_", " ") || "—" },
+        ].map((row, i) => (
+          <View key={i} style={[styles.infoRow, i > 0 && styles.infoRowBorder]}>
+            <Ionicons name={row.icon as any} size={16} color={COLORS.textMuted} />
             <View style={{ flex: 1 }}>
               <Text style={styles.infoLabel}>{row.label}</Text>
               <Text style={styles.infoValue}>{row.value}</Text>
@@ -103,198 +60,108 @@ export default function Profile() {
 
       {/* Quick links */}
       {user?.role === "student" && (
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Quick Links</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardLabel}>QUICK LINKS</Text>
           {[
-            {
-              label: "My Events & Quizzes",
-              icon: "calendar-outline",
-              onPress: () => router.push("/(core)/events"),
-            },
-            {
-              label: "Hostel Room Requests",
-              icon: "business-outline",
-              onPress: () => router.push("/(core)/hostel"),
-            },
-          ].map((item) => (
+            { label: "My Events & Quizzes", icon: "calendar-outline", route: "/(core)/events" },
+            { label: "Hostel Requests", icon: "business-outline", route: "/(core)/hostel" },
+            { label: "Lost & Found", icon: "search-outline", route: "/(core)/lost-found" },
+          ].map((item, i) => (
             <TouchableOpacity
-              key={item.label}
-              style={styles.linkRow}
-              onPress={item.onPress}
-              activeOpacity={0.7}
+              key={i}
+              style={[styles.linkRow, i > 0 && styles.infoRowBorder]}
+              onPress={() => router.push(item.route as any)}
             >
-              <Ionicons name={item.icon as any} size={18} color={COLORS.primary} />
+              <View style={styles.linkIcon}>
+                <Ionicons name={item.icon as any} size={17} color={COLORS.primary} />
+              </View>
               <Text style={styles.linkText}>{item.label}</Text>
-              <Ionicons name="chevron-forward" size={14} color={COLORS.textMuted} />
+              <Ionicons name="chevron-forward" size={14} color={COLORS.textDim} />
             </TouchableOpacity>
           ))}
         </View>
       )}
 
-      {/* Admin quick links */}
+      {/* Admin links */}
       {(user?.role === "admin" || user?.role === "superadmin") && (
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Admin Tools</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardLabel}>ADMIN TOOLS</Text>
           {[
-            {
-              label: "Manage Events",
-              icon: "settings-outline",
-              onPress: () => router.push("/(admin)/manage-event"),
-            },
-            {
-              label: "Priority & Rankings",
-              icon: "trophy-outline",
-              onPress: () => router.push("/(admin)/priority"),
-            },
-            {
-              label: "QR Entry Scanner",
-              icon: "qr-code-outline",
-              onPress: () => router.push("/qr-scanner"),
-            },
-          ].map((item) => (
+            { label: "Manage Events", icon: "settings-outline", route: "/(admin)/manage-event" },
+            { label: "Priority & Rankings", icon: "trophy-outline", route: "/(admin)/priority" },
+            { label: "QR Entry Scanner", icon: "qr-code-outline", route: "/qr-scanner" },
+          ].map((item, i) => (
             <TouchableOpacity
-              key={item.label}
-              style={styles.linkRow}
-              onPress={item.onPress}
-              activeOpacity={0.7}
+              key={i}
+              style={[styles.linkRow, i > 0 && styles.infoRowBorder]}
+              onPress={() => router.push(item.route as any)}
             >
-              <Ionicons name={item.icon as any} size={18} color="#10b981" />
+              <View style={[styles.linkIcon, { backgroundColor: COLORS.successBg, borderColor: COLORS.successBorder }]}>
+                <Ionicons name={item.icon as any} size={17} color={COLORS.success} />
+              </View>
               <Text style={styles.linkText}>{item.label}</Text>
-              <Ionicons name="chevron-forward" size={14} color={COLORS.textMuted} />
+              <Ionicons name="chevron-forward" size={14} color={COLORS.textDim} />
             </TouchableOpacity>
           ))}
         </View>
       )}
 
       {/* Logout */}
-      <TouchableOpacity style={styles.logoutBtn} onPress={logout} activeOpacity={0.8}>
-        <Ionicons name="log-out-outline" size={18} color="#ef4444" />
+      <TouchableOpacity style={styles.logoutBtn} onPress={logout} activeOpacity={0.85}>
+        <Ionicons name="log-out-outline" size={18} color={COLORS.primary} />
         <Text style={styles.logoutText}>Sign Out</Text>
       </TouchableOpacity>
 
       <Text style={styles.version}>Campus360 · v1.0</Text>
-
-      <View style={{ height: 40 }} />
+      <View style={{ height: 30 }} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+  container: { flex: 1, backgroundColor: COLORS.background },
+  content: { paddingHorizontal: 20, paddingBottom: 20 },
+  topAccent: { height: 3, backgroundColor: COLORS.primary, marginBottom: 0 },
+  avatarSection: { alignItems: "center", paddingTop: 36, paddingBottom: 28 },
+  avatarRing: {
+    width: 90, height: 90, borderRadius: 45,
+    borderWidth: 2, padding: 3, marginBottom: 14,
   },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
-  },
-  avatarSection: {
-    alignItems: "center",
-    marginBottom: 28,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-  },
-  avatarText: {
-    fontSize: 28,
-    fontFamily: "DMSans_800ExtraBold",
-  },
-  name: {
-    color: COLORS.textPrimary,
-    fontSize: 22,
-    fontFamily: "DMSans_700Bold",
-    marginBottom: 4,
-  },
-  email: {
-    color: COLORS.textMuted,
-    fontSize: 14,
-    fontFamily: "DMSans_400Regular",
-    marginBottom: 10,
-  },
+  avatar: { flex: 1, borderRadius: 40, justifyContent: "center", alignItems: "center" },
+  avatarText: { fontSize: 28, fontFamily: FONT.extraBold },
+  name: { color: COLORS.textPrimary, fontSize: 22, fontFamily: FONT.bold, marginBottom: 4 },
+  email: { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular, marginBottom: 12 },
   roleBadge: {
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 999,
+    paddingHorizontal: 14, paddingVertical: 5,
+    borderRadius: RADIUS.chip, borderWidth: 1,
   },
-  roleText: {
-    fontSize: 11,
-    fontFamily: "DMSans_700Bold",
-    letterSpacing: 1.5,
+  roleText: { fontSize: 11, fontFamily: FONT.bold, letterSpacing: 2 },
+  card: {
+    backgroundColor: COLORS.surface, borderRadius: RADIUS.lg,
+    borderWidth: 1, borderColor: COLORS.border, padding: 16, marginBottom: 14,
   },
-  sectionCard: {
-    backgroundColor: "#111827",
-    borderRadius: RADIUS.card,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 16,
-    marginBottom: 14,
+  cardLabel: {
+    color: COLORS.textMuted, fontSize: 10, fontFamily: FONT.bold,
+    letterSpacing: 2, marginBottom: 14,
   },
-  sectionTitle: {
-    color: COLORS.textPrimary,
-    fontSize: 14,
-    fontFamily: "DMSans_700Bold",
-    marginBottom: 14,
-  },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  infoLabel: {
-    color: COLORS.textMuted,
-    fontSize: 11,
-    fontFamily: "DMSans_500Medium",
-    marginBottom: 3,
-  },
-  infoValue: {
-    color: COLORS.textPrimary,
-    fontSize: 14,
-    fontFamily: "DMSans_500Medium",
-  },
+  infoRow: { flexDirection: "row", alignItems: "flex-start", gap: 12, paddingVertical: 11 },
+  infoRowBorder: { borderTopWidth: 1, borderTopColor: COLORS.border },
+  infoLabel: { color: COLORS.textMuted, fontSize: 11, fontFamily: FONT.medium, marginBottom: 2 },
+  infoValue: { color: COLORS.textPrimary, fontSize: 14, fontFamily: FONT.medium, textTransform: "capitalize" },
   linkRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingVertical: 13,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12,
   },
-  linkText: {
-    flex: 1,
-    color: COLORS.textPrimary,
-    fontSize: 14,
-    fontFamily: "DMSans_500Medium",
+  linkIcon: {
+    width: 36, height: 36, borderRadius: 10,
+    backgroundColor: COLORS.primaryGlow, borderWidth: 1, borderColor: COLORS.primaryBorder,
+    justifyContent: "center", alignItems: "center",
   },
+  linkText: { flex: 1, color: COLORS.textPrimary, fontSize: 14, fontFamily: FONT.medium },
   logoutBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    backgroundColor: "rgba(239,68,68,0.1)",
-    borderWidth: 1,
-    borderColor: "rgba(239,68,68,0.2)",
-    borderRadius: 14,
-    paddingVertical: 14,
-    marginBottom: 16,
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: COLORS.primaryGlow, borderWidth: 1, borderColor: COLORS.primaryBorder,
+    borderRadius: RADIUS.md, paddingVertical: 15, marginBottom: 16,
   },
-  logoutText: {
-    color: "#ef4444",
-    fontSize: 15,
-    fontFamily: "DMSans_700Bold",
-  },
-  version: {
-    color: COLORS.textMuted,
-    fontSize: 11,
-    textAlign: "center",
-    fontFamily: "DMSans_400Regular",
-    marginBottom: 8,
-  },
+  logoutText: { color: COLORS.primary, fontSize: 15, fontFamily: FONT.bold },
+  version: { color: COLORS.textDim, fontSize: 11, textAlign: "center", fontFamily: FONT.regular },
 });

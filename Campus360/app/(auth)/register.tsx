@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,33 +7,151 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  TextInput,
   ScrollView,
+  StatusBar,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { COLORS, RADIUS } from "../../utils/theme";
-import Button from "../../components/Button";
-import Input from "../../components/Input";
-import Card from "../../components/Card";
-import API from "../../utils/api";
+import { Ionicons } from "@expo/vector-icons";
+import { COLORS, FONT, RADIUS } from "../../utils/theme"; // Assuming these are correctly imported
+import API from "../../utils/api"; // Assuming this is correctly imported
+
+// Define types for clarity and safety
+type ResidentType = "day_scholar" | "hosteller";
+type FocusedField = "name" | "sid" | "email" | "pass" | "cpass" | "block" | "room" | null;
+
+// Constants for icon names
+const PERSON_OUTLINE = "person-outline";
+const ID_CARD_OUTLINE = "id-card-outline";
+const MAIL_OUTLINE = "mail-outline";
+const LOCK_CLOSED_OUTLINE = "lock-closed-outline";
+const EYE_OUTLINE = "eye-outline";
+const EYE_OFF_OUTLINE = "eye-off-outline";
+const ARROW_BACK = "arrow-back";
+const ARROW_FORWARD = "arrow-forward";
+const HOME_OUTLINE = "home-outline";
+const BUSINESS_OUTLINE = "business-outline";
+const INFORMATION_CIRCLE_OUTLINE = "information-circle-outline";
+const GRID_OUTLINE = "grid-outline";
+const BED_OUTLINE = "bed-outline";
+
+interface FieldProps {
+  icon: React.ComponentProps<typeof Ionicons>["name"];
+  placeholder: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  keyboardType?: TextInput["props"]["keyboardType"];
+  secureTextEntry?: boolean;
+  fieldKey: string; // Use a more descriptive key if possible, e.g., 'name', 'studentId'
+  right?: React.ReactNode;
+  onFocus?: () => void;
+  onBlur?: () => void;
+}
+
+const Field: React.FC<FieldProps> = ({
+  icon,
+  placeholder,
+  value,
+  onChangeText,
+  keyboardType = "default",
+  secureTextEntry = false,
+  fieldKey,
+  right,
+  onFocus,
+  onBlur,
+}) => {
+  const [isFocused, setIsFocused] = useState(false); // Local state for focus to avoid prop drilling if needed elsewhere
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    onFocus?.();
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    onBlur?.();
+  };
+
+  return (
+    <View style={[styles.inputWrap, isFocused && styles.inputFocused]}>
+      <Ionicons
+        name={icon}
+        size={17}
+        color={isFocused ? COLORS.primary : COLORS.textMuted}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder={placeholder}
+        placeholderTextColor={COLORS.textDim}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={keyboardType}
+        secureTextEntry={secureTextEntry}
+        autoCapitalize="none"
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+      />
+      {right}
+    </View>
+  );
+};
+
+// Reusable component for hostel block and room number inputs
+interface HostelInputProps {
+  icon: React.ComponentProps<typeof Ionicons>["name"];
+  placeholder: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  fieldKey: "block" | "room"; // Specific keys for hostel inputs
+}
+
+const HostelInput: React.FC<HostelInputProps> = ({ icon, placeholder, value, onChangeText, fieldKey }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
+
+  return (
+    <View style={[styles.inputWrap, { flex: 1 }, isFocused && styles.inputFocused]}>
+      <Ionicons name={icon} size={17} color={isFocused ? COLORS.primary : COLORS.textMuted} />
+      <TextInput
+        style={styles.input}
+        placeholder={placeholder}
+        placeholderTextColor={COLORS.textDim}
+        value={value}
+        onChangeText={onChangeText}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+      />
+    </View>
+  );
+};
+
 
 export default function Register() {
   const router = useRouter();
-
   const [name, setName] = useState("");
   const [studentId, setStudentId] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [residentType, setResidentType] = useState<"day_scholar" | "hosteller">("day_scholar");
+  const [residentType, setResidentType] = useState<ResidentType>("day_scholar");
   const [hostelBlock, setHostelBlock] = useState("");
   const [roomNumber, setRoomNumber] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [focusedField, setFocusedField] = useState<FocusedField>(null); // Renamed for clarity
 
-  const handleStudentIdChange = (text: string) => {
-    const numeric = text.replace(/[^0-9]/g, "");
-    if (numeric.length <= 10) setStudentId(numeric);
-  };
+  const handleStudentIdChange = useCallback((text: string) => {
+    const numericValue = text.replace(/[^0-9]/g, "");
+    if (numericValue.length <= 10) {
+      setStudentId(numericValue);
+    }
+  }, []);
 
   const handleRegister = async () => {
+    // Basic validation
     if (!name || !studentId || !email || !password || !confirmPassword) {
       Alert.alert("Error", "All fields are required");
       return;
@@ -47,145 +165,337 @@ export default function Register() {
       return;
     }
     if (residentType === "hosteller" && (!hostelBlock.trim() || !roomNumber.trim())) {
-      Alert.alert("Error", "Hostellers must enter their hostel block and room number");
+      Alert.alert("Error", "Hostellers must enter their block and room");
       return;
     }
 
-    try {
-      await API.post("/auth/register", {
-        name,
-        studentId,
-        email,
-        password,
-        residentType,
-        hostelBlock: residentType === "hosteller" ? hostelBlock.trim() : undefined,
-        roomNumber: residentType === "hosteller" ? roomNumber.trim() : undefined,
-      });
+    // Prepare data for API
+    const registrationData = {
+      name,
+      studentId,
+      email,
+      password,
+      residentType,
+      hostelBlock: residentType === "hosteller" ? hostelBlock.trim() : undefined,
+      roomNumber: residentType === "hosteller" ? roomNumber.trim() : undefined,
+    };
 
-      Alert.alert("Success", "Account created successfully!");
+    try {
+      await API.post("/auth/register", registrationData);
+      Alert.alert("✅ Account Created", "Sign in to get started");
       router.replace("/(auth)/login");
-    } catch (error: any) {
-      Alert.alert("Error", error.response?.data?.message || "Registration failed");
+    } catch (error: unknown) { // Use unknown for better type safety
+      // Attempt to extract a meaningful message from the error
+      let errorMessage = "Registration failed. Please try again.";
+      if (error instanceof Error) {
+        // Basic check for common error structures, e.g., from Axios
+        if (typeof error.message === 'string') {
+          errorMessage = error.message;
+        }
+        // More specific error handling could be added here if API error structure is known
+        // e.g., if (axios.isAxiosError(error) && error.response?.data?.message) {
+        //   errorMessage = error.response.data.message;
+        // }
+      }
+      Alert.alert("Error", errorMessage);
     }
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+      <View style={styles.glowBL} />
+
       <ScrollView
-        contentContainerStyle={styles.inner}
+        contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Campus360</Text>
-          <Text style={styles.subtitle}>Create your student account</Text>
+        {/* Back + Header */}
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} accessibilityLabel="Go back">
+          <Ionicons name={ARROW_BACK} size={20} color={COLORS.textSecondary} />
+        </TouchableOpacity>
+
+        <Text style={styles.headline}>Create{"\n"}Account.</Text>
+        <Text style={styles.tagline}>Join your campus community</Text>
+
+        {/* Step: Personal */}
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionNum}><Text style={styles.sectionNumText}>01</Text></View>
+          <Text style={styles.sectionLabel}>PERSONAL INFO</Text>
         </View>
 
-        <Card>
-          <Text style={styles.cardTitle}>Register</Text>
+        <Field
+          icon={PERSON_OUTLINE}
+          placeholder="Full name"
+          value={name}
+          onChangeText={setName}
+          fieldKey="name"
+          onFocus={() => setFocusedField("name")}
+          onBlur={() => setFocusedField(null)}
+        />
+        <Field
+          icon={ID_CARD_OUTLINE}
+          placeholder="Student ID (10 digits)"
+          value={studentId}
+          onChangeText={handleStudentIdChange}
+          keyboardType="numeric"
+          fieldKey="sid"
+          onFocus={() => setFocusedField("sid")}
+          onBlur={() => setFocusedField(null)}
+        />
+        <Field
+          icon={MAIL_OUTLINE}
+          placeholder="College email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address" // More specific keyboard type
+          fieldKey="email"
+          onFocus={() => setFocusedField("email")}
+          onBlur={() => setFocusedField(null)}
+        />
 
-          <Input label="Full Name" placeholder="Enter your full name" value={name} onChangeText={setName} />
-          <Input
-            label="Student ID"
-            placeholder="Enter 10-digit student ID"
-            value={studentId}
-            onChangeText={handleStudentIdChange}
-            keyboardType="numeric"
-          />
-          <Input label="Email" placeholder="Enter your college email" value={email} onChangeText={setEmail} />
-          <Input label="Password" placeholder="Create a password" value={password} onChangeText={setPassword} secureTextEntry />
-          <Input label="Confirm Password" placeholder="Re-enter your password" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
+        {/* Step: Security */}
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionNum}><Text style={styles.sectionNumText}>02</Text></View>
+          <Text style={styles.sectionLabel}>SECURITY</Text>
+        </View>
 
-          {/* Resident Type Toggle */}
-          <Text style={styles.toggleLabel}>I am a</Text>
-          <View style={styles.toggleRow}>
-            <TouchableOpacity
-              style={[styles.toggleBtn, residentType === "day_scholar" && styles.toggleBtnActive]}
-              onPress={() => setResidentType("day_scholar")}
-            >
-              <Text style={[styles.toggleBtnText, residentType === "day_scholar" && styles.toggleBtnTextActive]}>
-                🏠  Day Scholar
-              </Text>
+        <Field
+          icon={LOCK_CLOSED_OUTLINE}
+          placeholder="Create password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPass}
+          fieldKey="pass"
+          onFocus={() => setFocusedField("pass")}
+          onBlur={() => setFocusedField(null)}
+          right={
+            <TouchableOpacity onPress={() => setShowPass(v => !v)} accessibilityLabel={showPass ? "Hide password" : "Show password"}>
+              <Ionicons name={showPass ? EYE_OFF_OUTLINE : EYE_OUTLINE} size={17} color={COLORS.textMuted} />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.toggleBtn, residentType === "hosteller" && styles.toggleBtnActiveHostel]}
-              onPress={() => setResidentType("hosteller")}
-            >
-              <Text style={[styles.toggleBtnText, residentType === "hosteller" && styles.toggleBtnTextActive]}>
-                🏢  Hosteller
-              </Text>
-            </TouchableOpacity>
-          </View>
+          }
+        />
+        <Field
+          icon={LOCK_CLOSED_OUTLINE}
+          placeholder="Confirm password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry={!showPass}
+          fieldKey="cpass"
+          onFocus={() => setFocusedField("cpass")}
+          onBlur={() => setFocusedField(null)}
+        />
 
-          {/* Hostel fields — only shown for hostellers */}
-          {residentType === "hosteller" && (
-            <View style={styles.hostelFields}>
-              <View style={styles.hostelNote}>
-                <Text style={styles.hostelNoteText}>
-                  Enter your current hostel details. These can be updated by the warden.
-                </Text>
-              </View>
-              <Input
-                label="Hostel Block"
-                placeholder="e.g. Block A"
+        {/* Step: Resident */}
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionNum}><Text style={styles.sectionNumText}>03</Text></View>
+          <Text style={styles.sectionLabel}>RESIDENCY</Text>
+        </View>
+
+        <View style={styles.toggleRow}>
+          <TouchableOpacity
+            style={[styles.toggleBtn, residentType === "day_scholar" && styles.toggleActive]}
+            onPress={() => setResidentType("day_scholar")}
+            accessibilityRole="button"
+            accessibilityState={{ selected: residentType === "day_scholar" }}
+          >
+            <Ionicons name={HOME_OUTLINE} size={18} color={residentType === "day_scholar" ? "#fff" : COLORS.textMuted} />
+            <Text style={[styles.toggleText, residentType === "day_scholar" && styles.toggleTextActive]}>Day Scholar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleBtn, residentType === "hosteller" && styles.toggleActive]}
+            onPress={() => setResidentType("hosteller")}
+            accessibilityRole="button"
+            accessibilityState={{ selected: residentType === "hosteller" }}
+          >
+            <Ionicons name={BUSINESS_OUTLINE} size={18} color={residentType === "hosteller" ? "#fff" : COLORS.textMuted} />
+            <Text style={[styles.toggleText, residentType === "hosteller" && styles.toggleTextActive]}>Hosteller</Text>
+          </TouchableOpacity>
+        </View>
+
+        {residentType === "hosteller" && (
+          <>
+            <View style={styles.hostelNote}>
+              <Ionicons name={INFORMATION_CIRCLE_OUTLINE} size={15} color={COLORS.primary} />
+              <Text style={styles.hostelNoteText}>Enter your current hostel details</Text>
+            </View>
+            <View style={styles.rowInputs}>
+              <HostelInput
+                icon={GRID_OUTLINE}
+                placeholder="Block (e.g. A)"
                 value={hostelBlock}
                 onChangeText={setHostelBlock}
+                fieldKey="block"
               />
-              <Input
-                label="Room Number"
-                placeholder="e.g. A-204"
+              <HostelInput
+                icon={BED_OUTLINE}
+                placeholder="Room (e.g. A-204)"
                 value={roomNumber}
                 onChangeText={setRoomNumber}
+                fieldKey="room"
               />
             </View>
-          )}
+          </>
+        )}
 
-          <View style={{ height: 12 }} />
-          <Button title="Create Account" onPress={handleRegister} />
-        </Card>
+        {/* Submit */}
+        <TouchableOpacity style={styles.submitBtn} onPress={handleRegister} activeOpacity={0.85} accessibilityLabel="Create Account">
+          <Text style={styles.submitText}>Create Account</Text>
+          <Ionicons name={ARROW_FORWARD} size={18} color="#fff" />
+        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.loginLink} onPress={() => router.replace("/(auth)/login")}>
+        <TouchableOpacity style={styles.loginLink} onPress={() => router.replace("/(auth)/login")} accessibilityLabel="Sign in">
           <Text style={styles.loginLinkText}>
-            Already have an account?{" "}
-            <Text style={styles.loginLinkHighlight}>Sign in</Text>
+            Already registered?{" "}
+            <Text style={styles.loginLinkHighlight}>Sign in →</Text>
           </Text>
         </TouchableOpacity>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 60 }} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background, paddingHorizontal: 24 },
-  inner: { paddingTop: 60, paddingBottom: 20 },
-  header: { alignItems: "center", marginBottom: 32 },
-  title: { fontSize: 36, fontFamily: "DMSans_800ExtraBold", color: COLORS.textPrimary },
-  subtitle: { fontSize: 14, fontFamily: "DMSans_400Regular", color: COLORS.textMuted, marginTop: 6, textAlign: "center" },
-  cardTitle: { fontSize: 18, fontFamily: "DMSans_700Bold", color: COLORS.textPrimary, marginBottom: 20 },
-  toggleLabel: { color: COLORS.textMuted, fontSize: 13, fontFamily: "DMSans_500Medium", marginBottom: 10 },
-  toggleRow: { flexDirection: "row", gap: 10, marginBottom: 16 },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  glowBL: {
+    position: "absolute",
+    bottom: -60,
+    left: -60,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: COLORS.primary,
+    opacity: 0.08,
+  },
+  scroll: { paddingHorizontal: 26, paddingTop: 60, paddingBottom: 20 },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 28,
+  },
+  headline: {
+    color: COLORS.textPrimary,
+    fontSize: 46,
+    fontFamily: FONT.extraBold,
+    lineHeight: 50,
+    marginBottom: 10,
+  },
+  tagline: {
+    color: COLORS.textMuted,
+    fontSize: 14,
+    fontFamily: FONT.regular,
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 14,
+    marginTop: 8,
+  },
+  sectionNum: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 6,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+  },
+  sectionNumText: {
+    color: "#fff",
+    fontSize: 11,
+    fontFamily: FONT.bold,
+  },
+  sectionLabel: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+    fontFamily: FONT.bold,
+    letterSpacing: 2,
+  },
+  inputWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: 15,
+    paddingVertical: 13,
+    marginBottom: 10,
+  },
+  inputFocused: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.surfaceHigh,
+  },
+  input: {
+    flex: 1,
+    color: COLORS.textPrimary,
+    fontSize: 14,
+    fontFamily: FONT.regular,
+  },
+  rowInputs: { flexDirection: "row", gap: 10 },
+  toggleRow: { flexDirection: "row", gap: 10, marginBottom: 12 },
   toggleBtn: {
-    flex: 1, paddingVertical: 12, borderRadius: 12,
-    borderWidth: 1, borderColor: COLORS.border,
-    backgroundColor: "#0f172a", alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
   },
-  toggleBtnActive: { borderColor: COLORS.primary, backgroundColor: "rgba(99,102,241,0.12)" },
-  toggleBtnActiveHostel: { borderColor: "#10b981", backgroundColor: "rgba(16,185,129,0.12)" },
-  toggleBtnText: { color: COLORS.textMuted, fontSize: 14, fontFamily: "DMSans_500Medium" },
-  toggleBtnTextActive: { color: COLORS.textPrimary, fontFamily: "DMSans_700Bold" },
-  hostelFields: { marginTop: 4 },
+  toggleActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  toggleText: {
+    color: COLORS.textMuted,
+    fontSize: 13,
+    fontFamily: FONT.semiBold,
+  },
+  toggleTextActive: {
+    color: "#fff",
+  },
   hostelNote: {
-    backgroundColor: "rgba(16,185,129,0.08)", borderWidth: 1,
-    borderColor: "rgba(16,185,129,0.2)", borderRadius: 10, padding: 12, marginBottom: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: COLORS.primaryGlow,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: COLORS.primaryBorder,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
   },
-  hostelNoteText: { color: "#10b981", fontSize: 12, fontFamily: "DMSans_400Regular", lineHeight: 18 },
-  loginLink: { marginTop: 24, alignItems: "center" },
-  loginLinkText: { fontFamily: "DMSans_400Regular", color: COLORS.textMuted },
-  loginLinkHighlight: { color: COLORS.primary, fontFamily: "DMSans_600SemiBold" },
+  hostelNoteText: { color: COLORS.primary, fontSize: 12, fontFamily: FONT.medium },
+  submitBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.md,
+    paddingVertical: 17,
+    marginTop: 18,
+    marginBottom: 16,
+  },
+  submitText: { color: "#fff", fontSize: 16, fontFamily: FONT.bold },
+  loginLink: { alignItems: "center" },
+  loginLinkText: { color: COLORS.textMuted, fontSize: 14, fontFamily: FONT.regular },
+  loginLinkHighlight: { color: COLORS.primary, fontFamily: FONT.semiBold },
 });
