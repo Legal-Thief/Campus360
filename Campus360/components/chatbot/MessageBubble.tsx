@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { COLORS } from "../../utils/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { COLORS, FONT, RADIUS } from "../../utils/theme";
 
 interface Props {
   message: string;
@@ -14,7 +15,7 @@ export default function MessageBubble({ message, isUser, image, baseUrl }: Props
     <View style={[styles.bubble, isUser ? styles.userBubble : styles.botBubble]}>
       {!isUser && (
         <View style={styles.botAvatar}>
-          <Text style={styles.botAvatarText}>🗺</Text>
+          <Ionicons name="navigate-outline" size={14} color={COLORS.primary} />
         </View>
       )}
       <View style={[styles.content, isUser ? styles.userContent : styles.botContent]}>
@@ -43,24 +44,21 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     gap: 8,
   },
-  userBubble: {
-    justifyContent: "flex-end",
-  },
-  botBubble: {
-    justifyContent: "flex-start",
-  },
+  userBubble: { justifyContent: "flex-end" },
+  botBubble:  { justifyContent: "flex-start" },
+
   botAvatar: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: "#1e293b",
+    backgroundColor: COLORS.primaryGlow,
+    borderWidth: 1,
+    borderColor: COLORS.primaryBorder,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
   },
-  botAvatarText: {
-    fontSize: 14,
-  },
+
   content: {
     maxWidth: "78%",
     borderRadius: 16,
@@ -73,9 +71,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   botContent: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#1e293b",
+    borderColor: COLORS.border,
     borderBottomLeftRadius: 4,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -83,19 +81,19 @@ const styles = StyleSheet.create({
   image: {
     width: 220,
     height: 140,
-    borderRadius: 10,
+    borderRadius: RADIUS.sm,
     marginBottom: 6,
   },
   text: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 21,
   },
   userText: {
     color: "#fff",
-    fontFamily: "DMSans_400Regular",
+    fontFamily: FONT.regular,
   },
   botText: {
-    color: "#e2e8f0",
-    fontFamily: "DMSans_400Regular",
+    color: COLORS.textSecondary,
+    fontFamily: FONT.regular,
   },
 });
