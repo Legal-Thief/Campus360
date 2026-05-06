@@ -137,7 +137,7 @@ export default function Reports() {
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>Seat Summary</Text>
             <StatusRow label="Total seats" value={report.seatStats.total} color={COLORS.textMuted} />
-            <StatusRow label="Booked" value={report.seatStats.booked} color={COLORS.primary} />
+            <StatusRow label="Booked" value={report.seatStats.booked} color={COLORS.primary }/>
             <StatusRow label="Available" value={report.seatStats.available} color="#10b981" />
             <StatusRow label="Blocked" value={report.seatStats.blocked} color="#64748b" />
             <StatusRow label="Locked (pending)" value={report.seatStats.locked} color="#f59e0b" />

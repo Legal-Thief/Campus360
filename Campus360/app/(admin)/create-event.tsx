@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   pickerBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surfaceHigh,
+    backgroundColor: "#0F172A",
     borderRadius: RADIUS.button,
     padding: 15,
     borderWidth: 1,
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   },
   pickerText: { flex: 1, color: COLORS.textMuted, fontSize: 14 },
   dateBox: {
-    backgroundColor: COLORS.surfaceHigh,
+    backgroundColor: "#0F172A",
     borderRadius: RADIUS.button,
     padding: 15,
     borderWidth: 1,
