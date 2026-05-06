@@ -20,10 +20,10 @@ router.get("/found", getFoundItems);
 // Any logged-in user can report
 router.post("/add", protect, addItem);
 
-// Admin only
-router.get("/all", protect, roleMiddleware("admin", "superadmin"), getAllItems);
-router.get("/stats", protect, roleMiddleware("admin", "superadmin"), getStats);
-router.put("/status/:id", protect, roleMiddleware("admin", "superadmin"), updateStatus);
-router.put("/resolve/:id", protect, roleMiddleware("admin", "superadmin"), resolveItem);
+// Lost & Found admin + superadmin only
+router.get("/all",           protect, roleMiddleware("lostfound_admin", "superadmin"), getAllItems);
+router.get("/stats",         protect, roleMiddleware("lostfound_admin", "superadmin"), getStats);
+router.put("/status/:id",    protect, roleMiddleware("lostfound_admin", "superadmin"), updateStatus);
+router.put("/resolve/:id",   protect, roleMiddleware("lostfound_admin", "superadmin"), resolveItem);
 
 export default router;

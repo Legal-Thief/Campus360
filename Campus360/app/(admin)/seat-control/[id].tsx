@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
   // Header
   backBtn: {
     width: 40, height: 40, borderRadius: 20,
-    backgroundColor: "#111827", borderWidth: 1, borderColor: COLORS.border,
+    backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border,
     alignItems: "center", justifyContent: "center", marginBottom: 20,
   },
   pageTitle: {
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
 
   // Section card
   sectionCard: {
-    backgroundColor: "#111827", borderRadius: RADIUS.card,
+    backgroundColor: COLORS.surface, borderRadius: RADIUS.card,
     borderWidth: 1, borderColor: COLORS.border,
     padding: 16, marginBottom: 16,
   },
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
 
   // Input
   input: {
-    backgroundColor: "#0f172a", borderWidth: 1, borderColor: COLORS.border,
+    backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border,
     borderRadius: 10, padding: 13,
     color: COLORS.textPrimary, fontSize: 14,
     fontFamily: "DMSans_400Regular",
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
   // Stats
   statsRow: { flexDirection: "row", gap: 8, marginBottom: 16 },
   statCard: {
-    flex: 1, backgroundColor: "#111827", borderRadius: RADIUS.card,
+    flex: 1, backgroundColor: COLORS.surface, borderRadius: RADIUS.card,
     borderWidth: 1, padding: 12, alignItems: "center",
   },
   statValue: { fontSize: 20, fontFamily: "DMSans_800ExtraBold" },
@@ -691,7 +691,7 @@ const styles = StyleSheet.create({
   modePill: {
     paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20,
     borderWidth: 1, borderColor: COLORS.border,
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
   },
   modePillActive: { backgroundColor: "#6366f1", borderColor: "#6366f1" },
   modePillText: { color: COLORS.textMuted, fontSize: 12, fontFamily: "DMSans_500Medium" },
@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
     width: 26, color: COLORS.textMuted, fontSize: 10,
     fontFamily: "DMSans_700Bold", textAlign: "center",
     borderWidth: 0.5, borderColor: COLORS.border,
-    borderRadius: 4, padding: 2, backgroundColor: "#0f172a",
+    borderRadius: 4, padding: 2, backgroundColor: COLORS.surface,
   },
   rowLabelText: {
     color: COLORS.textMuted, fontSize: 11,
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
   rowActionBtn: {
     width: 22, height: 22, borderRadius: 5,
     borderWidth: 0.5, borderColor: COLORS.border,
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     justifyContent: "center", alignItems: "center",
   },
   rowActionDel: { borderColor: "#ef444444" },
@@ -810,7 +810,7 @@ const styles = StyleSheet.create({
   tip: {
     color: COLORS.textMuted, fontSize: 11,
     fontFamily: "DMSans_400Regular", lineHeight: 17,
-    backgroundColor: "#111827", borderRadius: 10,
+    backgroundColor: COLORS.surface, borderRadius: 10,
     borderWidth: 1, borderColor: COLORS.border,
     padding: 12, marginBottom: 8,
   },
@@ -823,7 +823,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 2, borderBottomRightRadius: 2,
     marginHorizontal: 2, overflow: "hidden",
   },
-  previewSeatBlocked: { backgroundColor: "#1e293b", opacity: 0.4 },
+  previewSeatBlocked: { backgroundColor: COLORS.border, opacity: 0.4 },
   previewNotch: {
     position: "absolute", top: 0, alignSelf: "center",
     width: "55%", height: 2,
@@ -834,12 +834,12 @@ const styles = StyleSheet.create({
   // Chips
   chipWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: {
-    backgroundColor: "#0f172a", borderWidth: 1,
+    backgroundColor: COLORS.surface, borderWidth: 1,
     borderColor: COLORS.border, borderRadius: 8,
     paddingHorizontal: 10, paddingVertical: 5,
   },
   chipPrimary: {
-    borderColor: "rgba(99,102,241,0.3)",
+    borderColor: COLORS.primaryBorder,
     backgroundColor: "rgba(99,102,241,0.08)",
   },
   chipText: { color: COLORS.textPrimary, fontSize: 12, fontFamily: "DMSans_600SemiBold" },

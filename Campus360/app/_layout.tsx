@@ -18,6 +18,8 @@ function RootNavigator() {
 
     if (role === "warden") {
       router.replace("/(warden)/dashboard");
+    } else if (role === "lostfound_admin") {
+      router.replace("/(lostfound)/dashboard");
     } else if (role === "admin" || role === "superadmin") {
       router.replace("/(admin)/dashboard");
     } else {

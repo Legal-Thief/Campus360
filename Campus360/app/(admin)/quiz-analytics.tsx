@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import API from "../../utils/api";
-import { COLORS, RADIUS } from "../../utils/theme";
+import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function QuizAnalytics() {
@@ -163,7 +163,7 @@ export default function QuizAnalytics() {
                   backgroundColor:
                     item.score >= stats.highest * 0.7
                       ? "rgba(16,185,129,0.15)"
-                      : "rgba(99,102,241,0.15)",
+                      : COLORS.primaryGlow,
                 },
               ]}
             >
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: "center",
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_500Medium",
   },
   sectionCard: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   rankRowTop: {
-    borderColor: "rgba(99,102,241,0.3)",
+    borderColor: COLORS.primaryBorder,
   },
   rankNum: {
     fontSize: 18,

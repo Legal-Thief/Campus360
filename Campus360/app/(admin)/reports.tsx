@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from "react-native";
 import API from "../../utils/api";
-import { COLORS, RADIUS } from "../../utils/theme";
+import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Reports() {
@@ -137,7 +137,7 @@ export default function Reports() {
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>Seat Summary</Text>
             <StatusRow label="Total seats" value={report.seatStats.total} color={COLORS.textMuted} />
-            <StatusRow label="Booked" value={report.seatStats.booked} color="#6366f1" />
+            <StatusRow label="Booked" value={report.seatStats.booked} color={COLORS.primary} />
             <StatusRow label="Available" value={report.seatStats.available} color="#10b981" />
             <StatusRow label="Blocked" value={report.seatStats.blocked} color="#64748b" />
             <StatusRow label="Locked (pending)" value={report.seatStats.locked} color="#f59e0b" />
@@ -192,7 +192,7 @@ export default function Reports() {
                         ? "rgba(245,158,11,0.15)"
                         : b.status === "break_expired"
                         ? "rgba(239,68,68,0.15)"
-                        : "rgba(99,102,241,0.15)",
+                        : COLORS.primaryGlow,
                   },
                 ]}
               >
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   eventChip: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_400Regular",
   },
   card: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_400Regular",
   },
   sectionCard: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   seatTag: {
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 6,

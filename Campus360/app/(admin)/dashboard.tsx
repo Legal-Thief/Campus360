@@ -1,72 +1,59 @@
 import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
+  View, Text, StyleSheet, TouchableOpacity,
+  FlatList, StatusBar, Dimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { COLORS, RADIUS } from "../../utils/theme";
+import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import { useAuth } from "../../context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 
+const { width } = Dimensions.get("window");
+const CARD_W = (width - 52) / 2;
+
+const actions = [
+  { title: "Create Event", subtitle: "Quiz-based seat booking", icon: "add-circle-outline", route: "/(admin)/create-event", tag: "NEW" },
+  { title: "Manage Events", subtitle: "Edit and control events", icon: "calendar-outline", route: "/(admin)/manage-event", tag: "LIVE" },
+  { title: "Quiz Analytics", subtitle: "Scores and stats", icon: "bar-chart-outline", route: "/(admin)/quiz-analytics", tag: "DATA" },
+  { title: "Priority", subtitle: "Generate rank and slots", icon: "trophy-outline", route: "/(admin)/priority", tag: "RANK" },
+  { title: "Seat Control", subtitle: "Auditorium layouts", icon: "grid-outline", route: "/(admin)/seat-control", tag: "ROOM" },
+  { title: "Reports", subtitle: "Export and view reports", icon: "document-text-outline", route: "/(admin)/reports", tag: "PDF" },
+];
+
 export default function AdminDashboard() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
-  const actions = [
-    {
-      title: "Create Event",
-      subtitle: "Create quiz based event",
-      icon: "add-circle-outline",
-      route: "/(admin)/create-event",
-    },
-    {
-      title: "Manage Events",
-      subtitle: "Edit and manage events",
-      icon: "calendar-outline",
-      route: "/(admin)/manage-event",
-    },
-    {
-      title: "Quiz Analytics",
-      subtitle: "See quiz scores and stats",
-      icon: "bar-chart-outline",
-      route: "/(admin)/quiz-analytics",
-    },
-    {
-      title: "Calculate Priority",
-      subtitle: "Generate rank and slots",
-      icon: "trophy-outline",
-      route: "/(admin)/priority",
-    },
-    {
-      title: "Seat Control",
-      subtitle: "Create auditorium layouts",
-      icon: "grid-outline",
-      route: "/(admin)/seat-control",
-    },
-    {
-      title: "Reports",
-      subtitle: "Export and view reports",
-      icon: "document-text-outline",
-      route: "/(admin)/reports",
-    },
-  ];
+  const initials = user?.name
+    ? user.name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)
+    : "AD";
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Admin Dashboard</Text>
-          <Text style={styles.subtitle}>
-            Manage events and auditorium layouts
-          </Text>
-        </View>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+      <View style={styles.topAccent} />
+      <View style={styles.bgAccentCircle} />
 
-        <TouchableOpacity onPress={logout}>
-          <Text style={styles.logout}>Logout</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initials}</Text>
+          </View>
+          <View>
+            <Text style={styles.adminLabel}>ADMIN PANEL</Text>
+            <Text style={styles.title}>Dashboard</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.logoutBtn} onPress={logout} activeOpacity={0.8}>
+          <Ionicons name="log-out-outline" size={17} color={COLORS.primary} />
         </TouchableOpacity>
+      </View>
+
+      {/* Section header */}
+      <View style={styles.sectionRow}>
+        <Text style={styles.sectionTitle}>MODULES</Text>
+        <View style={styles.sectionLine} />
       </View>
 
       <FlatList
@@ -74,30 +61,29 @@ export default function AdminDashboard() {
         keyExtractor={(item) => item.title}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={{ paddingBottom: 30 }}
-        renderItem={({ item }) => (
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        contentContainerStyle={{ gap: 12, paddingBottom: 30 }}
+        renderItem={({ item, index }) => (
           <TouchableOpacity
-            style={styles.cardWrapper}
-            activeOpacity={0.85}
+            style={[styles.card, index === 0 && styles.cardFeatured]}
+            activeOpacity={0.82}
             onPress={() => router.push(item.route as any)}
           >
-            <View style={styles.card}>
-              <View style={styles.iconBox}>
-                <Ionicons
-                  name={item.icon as any}
-                  size={24}
-                  color={COLORS.primary}
-                />
-              </View>
+            {/* Tag */}
+            <View style={[styles.tag, index === 0 && styles.tagFeatured]}>
+              <Text style={[styles.tagText, index === 0 && styles.tagTextFeatured]}>{item.tag}</Text>
+            </View>
 
-              <Text style={styles.cardTitle}>
-                {item.title}
-              </Text>
+            {/* Icon */}
+            <View style={[styles.iconBox, index === 0 && styles.iconBoxFeatured]}>
+              <Ionicons name={item.icon as any} size={22} color={index === 0 ? "#fff" : COLORS.primary} />
+            </View>
 
-              <Text style={styles.cardSubtitle}>
-                {item.subtitle}
-              </Text>
+            <Text style={[styles.cardTitle, index === 0 && styles.cardTitleFeatured]}>{item.title}</Text>
+            <Text style={[styles.cardSubtitle, index === 0 && styles.cardSubtitleFeatured]}>{item.subtitle}</Text>
+
+            <View style={styles.cardArrow}>
+              <Ionicons name="arrow-forward" size={14} color={index === 0 ? "rgba(255,255,255,0.6)" : COLORS.textDim} />
             </View>
           </TouchableOpacity>
         )}
@@ -111,77 +97,80 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     paddingHorizontal: 20,
-    paddingTop: 70,
+    paddingTop: 60,
   },
-
+  topAccent: {
+    position: "absolute", top: 0, left: 0, right: 0,
+    height: 3, backgroundColor: COLORS.primary,
+  },
+  bgAccentCircle: {
+    position: "absolute", top: -60, right: -60,
+    width: 200, height: 200, borderRadius: 100,
+    backgroundColor: COLORS.primary, opacity: 0.08,
+  },
   header: {
-    marginBottom: 28,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
+    marginBottom: 24,
   },
-
-  title: {
-    color: COLORS.textPrimary,
-    fontSize: 30,
-    fontFamily: "DMSans_800ExtraBold",
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  avatar: {
+    width: 46, height: 46, borderRadius: 23,
+    backgroundColor: COLORS.primary,
+    justifyContent: "center", alignItems: "center",
   },
-
-  subtitle: {
-    color: COLORS.textMuted,
-    fontSize: 14,
-    marginTop: 6,
-    maxWidth: 220,
-    fontFamily: "DMSans_400Regular",
+  avatarText: { color: "#fff", fontSize: 17, fontFamily: FONT.bold },
+  adminLabel: {
+    color: COLORS.primary, fontSize: 9,
+    fontFamily: FONT.bold, letterSpacing: 2.5, marginBottom: 2,
   },
-
-  logout: {
-    color: COLORS.danger,
-    fontSize: 14,
-    marginTop: 8,
-    fontFamily: "DMSans_600SemiBold",
+  title: { color: COLORS.textPrimary, fontSize: 20, fontFamily: FONT.extraBold },
+  logoutBtn: {
+    width: 40, height: 40, borderRadius: 20,
+    borderWidth: 1, borderColor: COLORS.primaryBorder,
+    backgroundColor: COLORS.primaryGlow,
+    justifyContent: "center", alignItems: "center",
   },
-
-  row: {
-    justifyContent: "space-between",
+  sectionRow: {
+    flexDirection: "row", alignItems: "center",
+    gap: 12, marginBottom: 16, marginTop: 4,
   },
-
-  cardWrapper: {
-    width: "48%",
-    marginBottom: 18,
-  },
-
+  sectionTitle: { color: COLORS.textMuted, fontSize: 11, fontFamily: FONT.bold, letterSpacing: 3 },
+  sectionLine: { flex: 1, height: 1, backgroundColor: COLORS.border },
   card: {
-    backgroundColor: "#111827",
-    borderRadius: RADIUS.card,
+    width: CARD_W,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
-    padding: 18,
-    minHeight: 150,
+    padding: 16,
+    minHeight: 160,
     justifyContent: "space-between",
   },
-
+  cardFeatured: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  tag: {
+    alignSelf: "flex-start",
+    backgroundColor: COLORS.white20,
+    borderRadius: RADIUS.chip,
+    paddingHorizontal: 8, paddingVertical: 3,
+    marginBottom: 14,
+    borderWidth: 1, borderColor: COLORS.border,
+  },
+  tagFeatured: { backgroundColor: "rgba(0,0,0,0.25)", borderColor: "rgba(255,255,255,0.2)" },
+  tagText: { color: COLORS.textMuted, fontSize: 9, fontFamily: FONT.bold, letterSpacing: 1.5 },
+  tagTextFeatured: { color: "rgba(255,255,255,0.85)" },
   iconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: "rgba(59,130,246,0.12)",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 18,
+    width: 44, height: 44, borderRadius: 12,
+    backgroundColor: COLORS.primaryGlow,
+    borderWidth: 1, borderColor: COLORS.primaryBorder,
+    justifyContent: "center", alignItems: "center",
+    marginBottom: 12,
   },
-
-  cardTitle: {
-    color: COLORS.textPrimary,
-    fontSize: 16,
-    fontFamily: "DMSans_700Bold",
-    marginBottom: 8,
-  },
-
-  cardSubtitle: {
-    color: COLORS.textMuted,
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily: "DMSans_400Regular",
-  },
+  iconBoxFeatured: { backgroundColor: "rgba(0,0,0,0.25)", borderColor: "rgba(255,255,255,0.2)" },
+  cardTitle: { color: COLORS.textPrimary, fontSize: 14, fontFamily: FONT.bold, marginBottom: 4 },
+  cardTitleFeatured: { color: "#fff" },
+  cardSubtitle: { color: COLORS.textMuted, fontSize: 11, fontFamily: FONT.regular, lineHeight: 16 },
+  cardSubtitleFeatured: { color: "rgba(255,255,255,0.7)" },
+  cardArrow: { alignSelf: "flex-end", marginTop: 8 },
 });
