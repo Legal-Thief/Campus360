@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { COLORS, RADIUS } from "../../utils/theme";
+import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import { Ionicons } from "@expo/vector-icons";
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 14, color: COLORS.textMuted, marginBottom: 20 },
   divider: { height: 1, backgroundColor: COLORS.border, marginBottom: 25 },
   sectionCard: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     padding: 20,
     marginBottom: 25,
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   pickerBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0F172A",
+    backgroundColor: COLORS.surfaceHigh,
     borderRadius: RADIUS.button,
     padding: 15,
     borderWidth: 1,
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   },
   pickerText: { flex: 1, color: COLORS.textMuted, fontSize: 14 },
   dateBox: {
-    backgroundColor: "#0F172A",
+    backgroundColor: COLORS.surfaceHigh,
     borderRadius: RADIUS.button,
     padding: 15,
     borderWidth: 1,
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   },
   dateText: { color: COLORS.textPrimary },
   questionCard: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     padding: 15,
     marginBottom: 20,
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", justifyContent: "flex-end" },
   modalCard: {
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 24, borderTopRightRadius: 24,
     borderWidth: 1, borderColor: COLORS.border,
     padding: 24, paddingBottom: 40,

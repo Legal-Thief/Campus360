@@ -5,7 +5,7 @@ type User = {
   id: string;
   name: string;
   email: string;
-  role: "student" | "admin" | "superadmin" | "faculty" | "warden";
+  role: "student" | "admin" | "lostfound_admin" | "superadmin" | "faculty" | "warden";
 };
 
 type AuthContextType = {

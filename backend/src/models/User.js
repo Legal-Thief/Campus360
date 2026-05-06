@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true, select: false }, // hidden by default
     role: {
       type: String,
-      enum: ["student", "faculty", "warden", "admin", "superadmin"],
+      enum: ["student", "faculty", "warden", "admin", "lostfound_admin", "superadmin"],
       default: "student",
     },
     residentType: {

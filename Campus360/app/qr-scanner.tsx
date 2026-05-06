@@ -271,9 +271,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   studentCard: {
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#1e293b",
+    borderColor: COLORS.border,
     borderRadius: 16,
     padding: 18,
     width: "100%",
@@ -323,9 +323,9 @@ const styles = StyleSheet.create({
   manualRow: { flexDirection: "row", gap: 10 },
   manualInput: {
     flex: 1,
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#1e293b",
+    borderColor: COLORS.border,
     borderRadius: 10,
     padding: 12,
     color: "#f1f5f9",

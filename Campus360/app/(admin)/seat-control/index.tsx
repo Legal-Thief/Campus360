@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import API from "../../../utils/api";
-import { COLORS, RADIUS } from "../../../utils/theme";
+import { COLORS, FONT, RADIUS } from "../../../utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function SeatControlIndex() {
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_700Bold",
   },
   card: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     padding: 18,
     marginBottom: 14,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   rowChip: {
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 6,

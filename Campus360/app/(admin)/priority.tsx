@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from "react-native";
 import API from "../../utils/api";
-import { COLORS, RADIUS } from "../../utils/theme";
+import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Priority() {
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   eventChip: {
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#111827",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,

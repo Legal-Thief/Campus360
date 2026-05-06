@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 18,
     borderBottomWidth: 1,
-    borderBottomColor: "#0f172a",
+    borderBottomColor: COLORS.surface,
   },
 
   headerLabel: {
@@ -296,9 +296,9 @@ const styles = StyleSheet.create({
   },
 
   hallTag: {
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#1e293b",
+    borderColor: COLORS.border,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -346,9 +346,9 @@ const styles = StyleSheet.create({
   },
 
   stageBar: {
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#1e293b",
+    borderColor: COLORS.border,
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   stageShadow: {
     height: 5,
     marginHorizontal: 20,
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
     opacity: 0.5,
@@ -386,9 +386,9 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 5,
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#1e293b",
+    borderColor: COLORS.border,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   aisle: {
     width: 16,
     borderLeftWidth: 1,
-    borderLeftColor: "#1e293b",
+    borderLeftColor: COLORS.border,
     height: 28,
     marginHorizontal: 4,
   },
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#0a0f1e",
     borderTopWidth: 1,
-    borderTopColor: "#0f172a",
+    borderTopColor: COLORS.surface,
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 32,
@@ -490,9 +490,9 @@ const styles = StyleSheet.create({
   },
 
   seatChip: {
-    backgroundColor: "#0f172a",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#1e293b",
+    borderColor: COLORS.border,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 7,
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   },
 
   confirmButtonDisabled: {
-    backgroundColor: "#1e293b",
+    backgroundColor: COLORS.border,
     shadowOpacity: 0,
     elevation: 0,
   },
