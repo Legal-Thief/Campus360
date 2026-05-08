@@ -146,6 +146,11 @@ export default function LostFoundAdminDashboard() {
 
   return (
     <View style={styles.container}>
+      {/* Top accent + right vertical bar — admin (lostfound) screen rule */}
+      <View style={styles.topAccent} />
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -412,7 +417,10 @@ function ItemCard({
         </View>
 
         {item.address ? (
-          <Text style={styles.addressText}>📍 {item.address}</Text>
+          <View style={styles.addressRow}>
+            <Ionicons name="location-outline" size={12} color={COLORS.textMuted} />
+            <Text style={styles.addressText}>{item.address}</Text>
+          </View>
         ) : null}
 
         <Text style={styles.dateText}>
@@ -463,6 +471,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     paddingHorizontal: 20,
     paddingTop: 60,
+  },
+  topAccent: {
+    position: "absolute", top: 0, left: 0, right: 0,
+    height: 3, backgroundColor: COLORS.primary,
+  },
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
   },
   center: {
     flex: 1,
@@ -690,11 +712,16 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: COLORS.textMuted,
   },
+  addressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 4,
+  },
   addressText: {
     color: COLORS.textMuted,
     fontSize: 12,
     fontFamily: "DMSans_400Regular",
-    marginBottom: 4,
   },
   dateText: {
     color: COLORS.textMuted,

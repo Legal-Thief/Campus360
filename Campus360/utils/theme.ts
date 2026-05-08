@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────────
-//  Campus360 Theme — Brutal Red / Black / White
-// ─────────────────────────────────────────────
-
 export const COLORS = {
   // Core palette
   background:   "#0A0A0A",   // near-black
@@ -44,13 +40,15 @@ export const COLORS = {
 };
 
 export const RADIUS = {
-  xs:   6,
-  sm:   10,
-  md:   14,
-  lg:   18,
-  xl:   24,
-  chip: 999,
-  card: 16,
+  xs:     6,
+  sm:     10,
+  md:     14,
+  lg:     18,
+  xl:     24,
+  chip:   999,
+  card:   16,
+  button: 12,   // standard CTA buttons
+  sheet:  24,   // bottom sheet corners
 };
 
 export const FONT = {

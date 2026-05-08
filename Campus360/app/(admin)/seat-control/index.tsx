@@ -43,6 +43,11 @@ export default function SeatControlIndex() {
 
   return (
     <View style={styles.container}>
+      {/* Top accent + right vertical bar — admin screen rule */}
+      <View style={styles.topAccent} />
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Seat Control</Text>
@@ -124,6 +129,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     padding: 20,
     paddingTop: 60,
+  },
+  topAccent: {
+    position: "absolute", top: 0, left: 0, right: 0,
+    height: 3, backgroundColor: COLORS.primary,
+  },
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
   },
   center: {
     flex: 1,

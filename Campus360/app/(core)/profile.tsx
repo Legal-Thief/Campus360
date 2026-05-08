@@ -4,10 +4,12 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../context/AuthContext";
 import { COLORS, FONT, RADIUS } from "../../utils/theme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Profile() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const initials = user?.name
     ? user.name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)
@@ -23,9 +25,11 @@ export default function Profile() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <StatusBar barStyle="light-content" />
       <View style={styles.topAccent} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
 
       {/* Avatar */}
-      <View style={styles.avatarSection}>
+      <View style={[styles.avatarSection, { paddingTop: Math.max(insets.top, 20) + 16 }]}>
         <View style={[styles.avatarRing, { borderColor: rc }]}>
           <View style={[styles.avatar, { backgroundColor: rc + "22" }]}>
             <Text style={[styles.avatarText, { color: rc }]}>{initials}</Text>
@@ -122,6 +126,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { paddingHorizontal: 20, paddingBottom: 20 },
   topAccent: { height: 3, backgroundColor: COLORS.primary, marginBottom: 0 },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 260, height: 260, borderRadius: 130,
+    backgroundColor: COLORS.primary, opacity: 0.08,
+  },
   avatarSection: { alignItems: "center", paddingTop: 36, paddingBottom: 28 },
   avatarRing: {
     width: 90, height: 90, borderRadius: 45,

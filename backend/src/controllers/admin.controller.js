@@ -37,13 +37,25 @@ export const adminDashboard = async (req, res) => {
 // ========================
 export const getAllUsers = async (req, res) => {
   try {
-    const { role, residentType } = req.query;
+    const { role, residentType, search } = req.query;
     const filter = {};
+
     if (role) filter.role = role;
     if (residentType) filter.residentType = residentType;
 
+    // Text search across name, studentId and email
+    if (search && search.trim()) {
+      const rx = new RegExp(search.trim(), "i");
+      filter.$or = [
+        { name: rx },
+        { studentId: rx },
+        { email: rx },
+      ];
+    }
+
     const users = await User.find(filter)
       .select("-password")
+      .limit(search ? 20 : 0)   // cap results when searching
       .sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, users });

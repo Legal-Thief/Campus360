@@ -496,15 +496,117 @@ export const confirmSeatBooking = async (req, res) => {
   }
 };
 
+
+// =======================
+// ASSIGN SCANNERS (admin)
+// =======================
+export const assignScanners = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { userIds } = req.body; // array of user IDs to grant scanning access
+
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({ success: false, message: "Provide an array of userIds." });
+    }
+
+    const event = await Event.findById(eventId);
+    if (!event) return res.status(404).json({ success: false, message: "Event not found." });
+
+    const existingIds = event.scanners.map((s) => s.userId.toString());
+    const newEntries = userIds
+      .filter((id) => !existingIds.includes(id.toString()))
+      .map((id) => ({ userId: id, grantedBy: req.user._id, grantedAt: new Date() }));
+
+    event.scanners.push(...newEntries);
+    await event.save();
+
+    const populated = await Event.findById(eventId)
+      .populate("scanners.userId", "name studentId email role")
+      .select("scanners title");
+
+    res.status(200).json({
+      success: true,
+      message: `${newEntries.length} scanner(s) added.`,
+      scanners: populated.scanners,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// =======================
+// REMOVE SCANNER (admin)
+// =======================
+export const removeScanner = async (req, res) => {
+  try {
+    const { eventId, userId } = req.params;
+
+    const event = await Event.findById(eventId);
+    if (!event) return res.status(404).json({ success: false, message: "Event not found." });
+
+    const before = event.scanners.length;
+    event.scanners = event.scanners.filter((s) => s.userId.toString() !== userId);
+
+    if (event.scanners.length === before) {
+      return res.status(404).json({ success: false, message: "Scanner not found for this event." });
+    }
+
+    await event.save();
+    res.status(200).json({ success: true, message: "Scanner access revoked." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// =======================
+// GET EVENT SCANNERS (admin)
+// =======================
+export const getEventScanners = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    const event = await Event.findById(eventId)
+      .populate("scanners.userId", "name studentId email role")
+      .populate("scanners.grantedBy", "name")
+      .select("scanners title clubName");
+
+    if (!event) return res.status(404).json({ success: false, message: "Event not found." });
+
+    res.status(200).json({ success: true, scanners: event.scanners, eventTitle: event.title });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// =======================
+// GET MY ASSIGNED SCANNER EVENTS
+// =======================
+export const getMyScannerEvents = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const events = await Event.find({ "scanners.userId": userId })
+      .populate("auditoriumId", "name")
+      .select("title date venue status clubName scanners");
+
+    res.status(200).json({ success: true, events });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // =======================
 // QR SCAN
 // =======================
 export const scanQR = async (req, res) => {
   try {
-    const { qrToken } = req.body;
+    const { qrToken, eventId } = req.body;
 
     if (!qrToken) {
       return res.status(400).json({ success: false, message: "QR token required" });
+    }
+    if (!eventId) {
+      return res.status(400).json({ success: false, message: "eventId is required" });
     }
 
     const booking = await SeatBooking.findOne({ qrToken })
@@ -514,6 +616,14 @@ export const scanQR = async (req, res) => {
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Invalid QR code" });
+    }
+
+    // Ensure the scanned QR belongs to the event the scanner is authorised for
+    if (booking.eventId?._id?.toString() !== eventId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "This QR code does not belong to your assigned event.",
+      });
     }
 
     const now = new Date();
