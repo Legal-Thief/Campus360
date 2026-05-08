@@ -2,9 +2,8 @@ import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
 
-// ========================
+
 // REGISTER
-// ========================
 export const register = async (req, res) => {
   try {
     const {
@@ -88,9 +87,8 @@ export const register = async (req, res) => {
   }
 };
 
-// ========================
+
 // LOGIN
-// ========================
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;

@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Alert, Modal, TextInput, FlatList, StatusBar,
+  ActivityIndicator, Modal, TextInput, FlatList, StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../context/AuthContext";
 import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import API from "../../utils/api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAlert } from "../../components/CustomAlert";
+import { useToast } from "../../components/Toast";
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; border: string }> = {
   pending:  { color: COLORS.warning,  bg: COLORS.warningBg,  border: COLORS.warningBorder },
@@ -16,6 +19,9 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; border: string 
 
 export default function Hostel() {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
+  const alert  = useAlert();
+  const toast  = useToast();
   const [tab, setTab] = useState<"my" | "swaps">("my");
   const [myRequests, setMyRequests] = useState<any[]>([]);
   const [openSwaps, setOpenSwaps] = useState<any[]>([]);
@@ -40,66 +46,61 @@ export default function Hostel() {
       setMyRequests(myRes.data.requests || []);
       setOpenSwaps(swapRes.data.requests || []);
     } catch {
-      Alert.alert("Error", "Failed to load hostel data");
+      alert.show({ type: "error", title: "Error", message: "Failed to load hostel data" });
     } finally {
       setLoading(false);
     }
   };
 
   const handleSubmitRequest = async () => {
-    if (!reason.trim()) { Alert.alert("Error", "Please provide a reason"); return; }
+    if (!reason.trim()) {
+      alert.show({ type: "warning", title: "Missing Field", message: "Please provide a reason for your request" });
+      return;
+    }
     try {
       setSubmitting(true);
       await API.post("/hostel/requests", {
-        type,
-        preferredBlock: preferredBlock.trim() || undefined,
-        preferredRoom: preferredRoom.trim() || undefined,
-        reason: reason.trim(),
+        type, preferredBlock: preferredBlock.trim() || undefined,
+        preferredRoom: preferredRoom.trim() || undefined, reason: reason.trim(),
       });
-      Alert.alert("Submitted", "Your request has been sent to the warden");
       setModalVisible(false);
       setPreferredBlock(""); setPreferredRoom(""); setReason("");
       fetchAll();
+      toast.show("Request submitted for warden review", "success");
     } catch (error: any) {
-      Alert.alert("Error", error?.response?.data?.message || "Failed to submit");
+      alert.show({ type: "error", title: "Error", message: error?.response?.data?.message || "Failed to submit" });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleCancelRequest = async (requestId: string) => {
-    Alert.alert("Cancel Request", "Are you sure?", [
-      { text: "No", style: "cancel" },
-      {
-        text: "Yes, cancel", style: "destructive",
-        onPress: async () => {
-          try { await API.delete(`/hostel/requests/${requestId}`); fetchAll(); }
-          catch { Alert.alert("Error", "Could not cancel request"); }
-        },
+    alert.confirm({
+      title: "Cancel Request",
+      message: "Are you sure you want to cancel this request?",
+      confirmLabel: "Yes, Cancel",
+      onConfirm: async () => {
+        try { await API.delete(`/hostel/requests/${requestId}`); fetchAll(); toast.show("Request cancelled", "info"); }
+        catch { alert.show({ type: "error", title: "Error", message: "Could not cancel request" }); }
       },
-    ]);
+    });
   };
 
   const handleOfferSwap = async (requestId: string) => {
-    Alert.alert(
-      "Offer Swap",
-      `Offer to swap your room (${user?.hostelBlock} · ${user?.roomNumber}) with this student?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Offer Swap",
-          onPress: async () => {
-            try {
-              await API.patch(`/hostel/requests/${requestId}/swap-offer`);
-              Alert.alert("Done", "Swap offer submitted for warden review");
-              fetchAll();
-            } catch (error: any) {
-              Alert.alert("Error", error?.response?.data?.message || "Failed");
-            }
-          },
-        },
-      ]
-    );
+    alert.confirm({
+      title: "Offer Swap",
+      message: `Offer to swap your room (${user?.hostelBlock} · ${user?.roomNumber}) with this student?`,
+      confirmLabel: "Offer Swap",
+      onConfirm: async () => {
+        try {
+          await API.patch(`/hostel/requests/${requestId}/swap-offer`);
+          toast.show("Swap offer submitted for warden review", "success");
+          fetchAll();
+        } catch (error: any) {
+          alert.show({ type: "error", title: "Error", message: error?.response?.data?.message || "Failed" });
+        }
+      },
+    });
   };
 
   if (user?.residentType !== "hosteller") {
@@ -116,9 +117,11 @@ export default function Hostel() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <View style={styles.topAccent} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
       <View style={styles.header}>
         <View>
           <Text style={styles.pageTitle}>Hostel</Text>
@@ -315,8 +318,9 @@ export default function Hostel() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background, paddingHorizontal: 20, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: COLORS.background, paddingHorizontal: 20 },
   topAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3, backgroundColor: COLORS.primary },
+  bgGlow:    { position: "absolute", top: -80, right: -80, width: 260, height: 260, borderRadius: 130, backgroundColor: COLORS.primary, opacity: 0.08 },
   center: { flex: 1, justifyContent: "center", alignItems: "center", gap: 14, padding: 32 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 },
   pageTitle: { color: COLORS.textPrimary, fontSize: 32, fontFamily: FONT.extraBold },

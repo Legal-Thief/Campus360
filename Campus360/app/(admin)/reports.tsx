@@ -75,6 +75,11 @@ export default function Reports() {
 
   return (
     <View style={styles.container}>
+      {/* Top accent + right vertical bar — admin screen rule */}
+      <View style={styles.topAccent} />
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
       <Text style={styles.title}>Reports</Text>
       <Text style={styles.subtitle}>Select an event to view its full report</Text>
 
@@ -231,6 +236,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     paddingHorizontal: 20,
     paddingTop: 60,
+  },
+  topAccent: {
+    position: "absolute", top: 0, left: 0, right: 0,
+    height: 3, backgroundColor: COLORS.primary,
+  },
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
   },
   center: {
     flex: 1,

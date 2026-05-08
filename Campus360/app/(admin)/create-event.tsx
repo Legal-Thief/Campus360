@@ -27,6 +27,7 @@ type Question = {
 export default function CreateEvent() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [clubName, setClubName] = useState("");
   const [date, setDate] = useState<Date | null>(null);
   const [deadline, setDeadline] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -113,6 +114,7 @@ export default function CreateEvent() {
       await API.post("/events", {
         title,
         description,
+        clubName: clubName.trim() || undefined,
         auditoriumId: selectedAuditorium._id,
         date,
         registrationDeadline: deadline,
@@ -151,6 +153,11 @@ export default function CreateEvent() {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      {/* Top accent + right vertical bar — admin screen rule */}
+      <View style={styles.topAccent} />
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.pageTitle}>Create Event</Text>
         <Text style={styles.subtitle}>Configure event details and build the quiz</Text>
@@ -162,6 +169,7 @@ export default function CreateEvent() {
           <Text style={styles.sectionTitle}>Event Details</Text>
           <Input placeholder="Event Title *" value={title} onChangeText={setTitle} />
           <Input placeholder="Description (optional)" value={description} onChangeText={setDescription} />
+          <Input placeholder="Club / Organization Name (optional)" value={clubName} onChangeText={setClubName} />
 
           {/* Auditorium Picker */}
           <TouchableOpacity
@@ -399,7 +407,7 @@ const styles = StyleSheet.create({
   pickerBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0F172A",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.button,
     padding: 15,
     borderWidth: 1,
@@ -408,7 +416,7 @@ const styles = StyleSheet.create({
   },
   pickerText: { flex: 1, color: COLORS.textMuted, fontSize: 14 },
   dateBox: {
-    backgroundColor: "#0F172A",
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.button,
     padding: 15,
     borderWidth: 1,
@@ -438,6 +446,20 @@ const styles = StyleSheet.create({
     position: "absolute", bottom: 0, left: 0, right: 0,
     padding: 20, backgroundColor: COLORS.background,
     borderTopWidth: 1, borderTopColor: COLORS.border,
+  },
+  topAccent: {
+    position: "absolute", top: 0, left: 0, right: 0,
+    height: 3, backgroundColor: COLORS.primary,
+  },
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
   },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", justifyContent: "flex-end" },
   modalCard: {

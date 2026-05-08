@@ -1,34 +1,55 @@
-import React from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
-import { COLORS, RADIUS } from "../utils/theme";
+import React, { useState } from "react";
+import { View, Text, TextInput, StyleSheet, TextInputProps } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { COLORS, FONT, RADIUS } from "../utils/theme";
 
-type Props = {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChangeText: (text: string) => void;
-  secureTextEntry?: boolean;
+type Props = TextInputProps & {
+  label?: string;
+  icon?: React.ComponentProps<typeof Ionicons>["name"];
+  rightElement?: React.ReactNode;
 };
 
 export default function Input({
   label,
-  placeholder,
-  value,
-  onChangeText,
-  secureTextEntry = false,
+  icon,
+  rightElement,
+  onFocus,
+  onBlur,
+  style,
+  ...rest
 }: Props) {
+  const [focused, setFocused] = useState(false);
+
+  const handleFocus = (e: any) => {
+    setFocused(true);
+    onFocus?.(e);
+  };
+
+  const handleBlur = (e: any) => {
+    setFocused(false);
+    onBlur?.(e);
+  };
+
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.container}>
+      {label ? <Text style={styles.label}>{label}</Text> : null}
+      <View style={[styles.container, focused && styles.containerFocused]}>
+        {icon ? (
+          <Ionicons
+            name={icon}
+            size={17}
+            color={focused ? COLORS.primary : COLORS.textMuted}
+            style={styles.icon}
+          />
+        ) : null}
         <TextInput
-          placeholder={placeholder}
           placeholderTextColor={COLORS.textDim}
-          value={value}
-          onChangeText={onChangeText}
-          secureTextEntry={secureTextEntry}
-          style={styles.input}
+          style={[styles.input, style]}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          {...rest}
         />
+        {rightElement}
       </View>
     </View>
   );
@@ -36,29 +57,38 @@ export default function Input({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 18,
+    marginBottom: 12,
   },
-
   label: {
     color: COLORS.textMuted,
-    fontSize: 13,
-    fontFamily: "DMSans_600SemiBold",
-    marginBottom: 6,
+    fontSize: 11,
+    fontFamily: FONT.semiBold,
+    letterSpacing: 1,
+    marginBottom: 7,
+    textTransform: "uppercase",
   },
-
   container: {
-    height: 52,
-    backgroundColor: "#0F172A",
-    borderRadius: RADIUS.button,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
     borderColor: COLORS.border,
-    justifyContent: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    minHeight: 52,
   },
-
+  containerFocused: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.surfaceHigh,
+  },
+  icon: {
+    marginRight: 10,
+  },
   input: {
-    paddingHorizontal: 16,
+    flex: 1,
     color: COLORS.textPrimary,
-    fontFamily: "DMSans_400Regular",
+    fontFamily: FONT.regular,
     fontSize: 15,
   },
 });

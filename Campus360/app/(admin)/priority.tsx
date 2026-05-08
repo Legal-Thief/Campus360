@@ -77,11 +77,11 @@ export default function Priority() {
     );
   };
 
-  const getMedal = (rank: number) => {
-    if (rank === 1) return "🥇";
-    if (rank === 2) return "🥈";
-    if (rank === 3) return "🥉";
-    return `#${rank}`;
+  const getRankLabel = (rank: number) => {
+    if (rank === 1) return { text: "#1", color: "#F59E0B" };  // gold
+    if (rank === 2) return { text: "#2", color: "#CCCCCC" };  // silver
+    if (rank === 3) return { text: "#3", color: "#CD7F32" };  // bronze
+    return { text: `#${rank}`, color: COLORS.textMuted };
   };
 
   const formatSlot = (start: string, end: string) => {
@@ -101,6 +101,11 @@ export default function Priority() {
 
   return (
     <View style={styles.container}>
+      {/* Top accent + right vertical bar — admin screen rule */}
+      <View style={styles.topAccent} />
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
       <Text style={styles.title}>Priority Calculation</Text>
       <Text style={styles.subtitle}>Select an event to view rankings</Text>
 
@@ -189,9 +194,11 @@ export default function Priority() {
               keyExtractor={(item) => item._id}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: 40 }}
-              renderItem={({ item, index }) => (
-                <View style={styles.rankRow}>
-                  <Text style={styles.rankMedal}>{getMedal(item.priority || index + 1)}</Text>
+              renderItem={({ item, index }) => {
+                const rankLabel = getRankLabel(item.priority || index + 1);
+                return (
+                  <View style={styles.rankRow}>
+                    <Text style={[styles.rankMedal, { color: rankLabel.color }]}>{rankLabel.text}</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.rankName}>
                       {item.userId?.name || "Unknown"}
@@ -210,7 +217,8 @@ export default function Priority() {
                     <Text style={styles.scoreLabel}>pts</Text>
                   </View>
                 </View>
-              )}
+              );
+              }}
             />
           ) : (
             <View style={styles.placeholder}>
@@ -231,6 +239,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     paddingHorizontal: 20,
     paddingTop: 60,
+  },
+  topAccent: {
+    position: "absolute", top: 0, left: 0, right: 0,
+    height: 3, backgroundColor: COLORS.primary,
+  },
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
   },
   center: {
     flex: 1,

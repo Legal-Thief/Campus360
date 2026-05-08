@@ -1,6 +1,9 @@
 import { Stack, useRouter } from "expo-router";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
+import { AlertProvider } from "../components/CustomAlert";
+import { ToastProvider } from "../components/Toast";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 function RootNavigator() {
   const { user, token, loading } = useAuth();
@@ -8,14 +11,8 @@ function RootNavigator() {
 
   useEffect(() => {
     if (loading) return;
-
-    if (!token) {
-      router.replace("/(auth)/login");
-      return;
-    }
-
+    if (!token) { router.replace("/(auth)/login"); return; }
     const role = user?.role;
-
     if (role === "warden") {
       router.replace("/(warden)/dashboard");
     } else if (role === "lostfound_admin") {
@@ -32,8 +29,14 @@ function RootNavigator() {
 
 export default function Layout() {
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <AlertProvider>
+          <ToastProvider>
+            <RootNavigator />
+          </ToastProvider>
+        </AlertProvider>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

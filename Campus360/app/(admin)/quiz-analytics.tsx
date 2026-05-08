@@ -74,15 +74,16 @@ export default function QuizAnalytics() {
   );
   const maxBucket = Math.max(...Object.values(buckets));
 
-  const getMedal = (rank: number) => {
-    if (rank === 1) return "🥇";
-    if (rank === 2) return "🥈";
-    if (rank === 3) return "🥉";
-    return null;
-  };
+  const getRankDisplay = (rank: number) =>
+    rank === 1 ? "#1" : rank === 2 ? "#2" : rank === 3 ? "#3" : null;
 
   return (
     <View style={styles.container}>
+      {/* Top accent + right vertical bar — admin screen rule */}
+      <View style={styles.topAccent} />
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={20} color={COLORS.textPrimary} />
       </TouchableOpacity>
@@ -145,10 +146,13 @@ export default function QuizAnalytics() {
             <Text style={styles.sectionTitle2}>Leaderboard</Text>
           </>
         }
-        renderItem={({ item, index }) => (
+        renderItem={({ item, index }) => {
+          const rank = item.priority || index + 1;
+          const label = getRankDisplay(rank) || `#${rank}`;
+          return (
           <View style={[styles.rankRow, index < 3 && styles.rankRowTop]}>
             <Text style={styles.rankNum}>
-              {getMedal(item.priority || index + 1) || `#${item.priority || index + 1}`}
+              {label}
             </Text>
             <View style={{ flex: 1 }}>
               <Text style={styles.rankName}>{item.userId?.name || "Unknown"}</Text>
@@ -180,7 +184,8 @@ export default function QuizAnalytics() {
               </Text>
             </View>
           </View>
-        )}
+          );
+        }}
       />
     </View>
   );
@@ -192,6 +197,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     paddingHorizontal: 20,
     paddingTop: 60,
+  },
+  topAccent: {
+    position: "absolute", top: 0, left: 0, right: 0,
+    height: 3, backgroundColor: COLORS.primary,
+  },
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
   },
   center: {
     flex: 1,

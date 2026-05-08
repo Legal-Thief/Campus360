@@ -97,6 +97,10 @@ export default function AdminLostFound() {
     <View style={styles.screen}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <View style={styles.topAccent} />
+      {/* Right vertical bar — admin screen rule */}
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
 
       <View style={styles.header}>
         <Text style={styles.title}>Lost & Found</Text>
@@ -308,6 +312,16 @@ export default function AdminLostFound() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.background },
   topAccent: { height: 3, backgroundColor: COLORS.primary },
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
+  },
   header: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16 },
   title: { color: COLORS.textPrimary, fontSize: 32, fontFamily: FONT.extraBold },
   subtitle: { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular, marginTop: 4 },

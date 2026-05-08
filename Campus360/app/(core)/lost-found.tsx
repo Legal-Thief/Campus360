@@ -2,7 +2,7 @@ import React, { useState, useCallback, useRef } from "react";
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   TextInput, Image, ActivityIndicator, Modal, ScrollView,
-  KeyboardAvoidingView, Platform, Alert, Animated, Dimensions, StatusBar,
+  KeyboardAvoidingView, Platform, Animated, Dimensions, StatusBar,
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
@@ -11,6 +11,9 @@ import API from "../../utils/api";
 import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import { uploadImageToCloudinary } from "../../utils/uploadImage";
 import { useAuth } from "../../context/AuthContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAlert } from "../../components/CustomAlert";
+import { useToast } from "../../components/Toast";
 
 const { width } = Dimensions.get("window");
 
@@ -34,6 +37,9 @@ const TAB_CONFIG = {
 
 export default function LostFoundScreen() {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
+  const alert  = useAlert();
+  const toast  = useToast();
   const [tab, setTab] = useState<"lost" | "found">("lost");
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +91,7 @@ export default function LostFoundScreen() {
 
   const pickImage = async () => {
     const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!granted) { Alert.alert("Permission needed", "Allow gallery access"); return; }
+    if (!granted) { alert.show({ type: "warning", title: "Permission Needed", message: "Allow gallery access to upload a photo" }); return; }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.7, aspect: [4, 3], allowsEditing: true,
@@ -96,17 +102,17 @@ export default function LostFoundScreen() {
   const submitReport = async () => {
     const { title, category: cat, location, date, studentId, mobileNumber } = form;
     if (!title || !cat || !location || !date || !studentId || !mobileNumber) {
-      Alert.alert("Missing fields", "Please fill all required (*) fields"); return;
+      alert.show({ type: "warning", title: "Missing Fields", message: "Please fill all required (*) fields" }); return;
     }
     setSubmitting(true);
     try {
       let imageUrl = "";
       if (image) imageUrl = await uploadImageToCloudinary(image);
       await API.post("/lost-found/add", { ...form, type: reportType, imageUrl, status: "pending" });
-      Alert.alert("Submitted!", "Your report is under admin review.");
       setModalVisible(false);
+      toast.show("Report submitted — under admin review", "success");
     } catch (err: any) {
-      Alert.alert("Error", err?.response?.data?.message || "Submission failed");
+      alert.show({ type: "error", title: "Error", message: err?.response?.data?.message || "Submission failed" });
     } finally { setSubmitting(false); }
   };
 
@@ -164,9 +170,11 @@ export default function LostFoundScreen() {
   );
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { paddingTop: insets.top }]}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <View style={styles.topAccent} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -443,6 +451,7 @@ export default function LostFoundScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.background },
   topAccent: { height: 3, backgroundColor: COLORS.primary },
+  bgGlow:    { position: "absolute", top: -80, right: -80, width: 260, height: 260, borderRadius: 130, backgroundColor: COLORS.primary, opacity: 0.08 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16 },
   headerTitle: { color: COLORS.textPrimary, fontSize: 32, fontFamily: FONT.extraBold },
   headerSub: { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular, marginTop: 4 },

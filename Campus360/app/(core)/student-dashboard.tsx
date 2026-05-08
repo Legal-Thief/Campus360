@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View, Text, StyleSheet, TouchableOpacity,
   FlatList, StatusBar, Dimensions,
@@ -6,6 +6,7 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../context/AuthContext";
+import API from "../../utils/api";
 import { COLORS, FONT, RADIUS } from "../../utils/theme";
 
 const { width } = Dimensions.get("window");
@@ -23,6 +24,20 @@ export default function StudentDashboard() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const isHosteller = user?.residentType === "hosteller";
+  const [hasScannerEvents, setHasScannerEvents] = useState(false);
+
+  // Check if this user has been assigned as a QR scanner for any event
+  useEffect(() => {
+    const checkScannerRole = async () => {
+      try {
+        const res = await API.get("/events/my-scanner-events");
+        setHasScannerEvents((res.data.events ?? []).length > 0);
+      } catch {
+        // silently fail — no scanner access tile shown
+      }
+    };
+    checkScannerRole();
+  }, []);
 
   const modules: Module[] = [
     {
@@ -57,6 +72,14 @@ export default function StudentDashboard() {
       tag: "AI",
       show: true,
     },
+    {
+      title: "QR Scanner",
+      subtitle: "Scan student entry QR codes",
+      route: "/qr-scanner",
+      icon: "qr-code",
+      tag: "SCAN",
+      show: hasScannerEvents,
+    },
   ].filter((m) => m.show);
 
   const initials = user?.name
@@ -64,11 +87,15 @@ export default function StudentDashboard() {
     : "??";
 
   return (
-    <View style={styles.container}>
+    <View style={styles.wrapper}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
 
-      {/* BG accent */}
-      <View style={styles.bgAccent} />
+      {/* Full-width 3px red top accent — student core rule */}
+      <View style={styles.topAccent} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
+
+      <View style={styles.container}>
 
       {/* ── Header ── */}
       <View style={styles.header}>
@@ -161,6 +188,7 @@ export default function StudentDashboard() {
           </TouchableOpacity>
         )}
       />
+      </View>
     </View>
   );
 }
@@ -168,19 +196,23 @@ export default function StudentDashboard() {
 const CARD_W = (width - 52) / 2;
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
     backgroundColor: COLORS.background,
-    paddingHorizontal: 20,
-    paddingTop: 60,
   },
-  bgAccent: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: 120,
+  topAccent: {
     height: 3,
     backgroundColor: COLORS.primary,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 260, height: 260, borderRadius: 130,
+    backgroundColor: COLORS.primary, opacity: 0.08,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 57,
   },
   header: {
     flexDirection: "row",

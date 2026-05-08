@@ -18,6 +18,7 @@ const actions = [
   { title: "Priority", subtitle: "Generate rank and slots", icon: "trophy-outline", route: "/(admin)/priority", tag: "RANK" },
   { title: "Seat Control", subtitle: "Auditorium layouts", icon: "grid-outline", route: "/(admin)/seat-control", tag: "ROOM" },
   { title: "Reports", subtitle: "Export and view reports", icon: "document-text-outline", route: "/(admin)/reports", tag: "PDF" },
+  { title: "Scanner Access", subtitle: "Assign QR scanning roles", icon: "qr-code-outline", route: "/(admin)/manage-scanners", tag: "QR" },
 ];
 
 export default function AdminDashboard() {
@@ -32,7 +33,10 @@ export default function AdminDashboard() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <View style={styles.topAccent} />
-      <View style={styles.bgAccentCircle} />
+      {/* Right vertical bar — admin screen rule */}
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -103,10 +107,15 @@ const styles = StyleSheet.create({
     position: "absolute", top: 0, left: 0, right: 0,
     height: 3, backgroundColor: COLORS.primary,
   },
-  bgAccentCircle: {
-    position: "absolute", top: -60, right: -60,
-    width: 200, height: 200, borderRadius: 100,
-    backgroundColor: COLORS.primary, opacity: 0.08,
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
   },
   header: {
     flexDirection: "row",
@@ -141,7 +150,7 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_W,
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
+    borderRadius: RADIUS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
     padding: 16,

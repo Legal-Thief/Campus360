@@ -273,11 +273,17 @@ export default function SeatControlDetail() {
     const total = aud.rows.length * aud.seatsPerRow;
 
     return (
-      <ScrollView
-        style={{ flex: 1, backgroundColor: COLORS.background }}
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+        {/* Top accent + right vertical bar — admin screen rule */}
+        <View style={styles.topAccent} />
+        <View style={styles.rightBar} />
+        {/* Top-right ambient glow */}
+        <View style={styles.bgGlow} />
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={20} color={COLORS.textPrimary} />
         </TouchableOpacity>
@@ -375,7 +381,8 @@ export default function SeatControlDetail() {
         </View>
 
         <View style={{ height: 40 }} />
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   }
 
@@ -384,6 +391,11 @@ export default function SeatControlDetail() {
   // ─────────────────────────────────────────────────────────────────────────────
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      {/* Top accent + right vertical bar — admin screen rule */}
+      <View style={styles.topAccent} />
+      <View style={styles.rightBar} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
       <ScrollView
         contentContainerStyle={[styles.container, { paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
@@ -633,6 +645,20 @@ const SEAT_H = 20;
 
 const styles = StyleSheet.create({
   container: { padding: 20, paddingTop: 60 },
+  topAccent: {
+    position: "absolute", top: 0, left: 0, right: 0,
+    height: 3, backgroundColor: COLORS.primary,
+  },
+  rightBar: {
+    position: "absolute", top: 0, right: 0,
+    width: 3, height: 120,
+    backgroundColor: COLORS.primary, opacity: 0.5,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 240, height: 240, borderRadius: 120,
+    backgroundColor: COLORS.primary, opacity: 0.07,
+  },
   center: {
     flex: 1, justifyContent: "center", alignItems: "center",
     backgroundColor: COLORS.background,
@@ -693,7 +719,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: COLORS.border,
     backgroundColor: COLORS.surface,
   },
-  modePillActive: { backgroundColor: "#6366f1", borderColor: "#6366f1" },
+  modePillActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   modePillText: { color: COLORS.textMuted, fontSize: 12, fontFamily: "DMSans_500Medium" },
   modePillTextActive: { color: "#fff", fontFamily: "DMSans_700Bold" },
 
@@ -702,18 +728,19 @@ const styles = StyleSheet.create({
   addBtn: {
     flexDirection: "row", alignItems: "center", gap: 5,
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8,
-    borderWidth: 1, borderColor: "#6366f133",
-    backgroundColor: "rgba(99,102,241,0.06)",
+    borderWidth: 1, borderColor: COLORS.primaryBorder,
+    backgroundColor: COLORS.primaryGlow,
   },
   addBtnText: { fontSize: 12, fontFamily: "DMSans_600SemiBold" },
 
   // Stage banner
   stageBanner: {
-    backgroundColor: "#1e1b4b", borderRadius: 8,
+    backgroundColor: COLORS.surface, borderRadius: 8,
+    borderWidth: 1, borderColor: COLORS.border,
     paddingVertical: 10, alignItems: "center", marginBottom: 4,
   },
   stageBannerText: {
-    color: "#a5b4fc", fontSize: 10,
+    color: COLORS.textMuted, fontSize: 10,
     fontFamily: "DMSans_700Bold", letterSpacing: 3,
   },
 

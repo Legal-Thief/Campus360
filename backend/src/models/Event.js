@@ -32,6 +32,19 @@ const eventSchema = new mongoose.Schema(
       enum: ["registration_open", "quiz_closed", "priority_calculated", "seat_selection", "completed"],
       default: "registration_open",
     },
+
+    // Club / organization that owns this event (optional)
+    clubName: { type: String, default: null, trim: true },
+
+    // Users authorized to scan QR codes for THIS event only
+    scanners: [
+      {
+        userId:      { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        grantedBy:   { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        grantedAt:   { type: Date, default: Date.now },
+      },
+    ],
+
     quiz: {
       duration: { type: Number, required: true, min: 1 },
       questions: {

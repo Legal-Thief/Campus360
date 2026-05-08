@@ -8,6 +8,7 @@ import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import ChatInput from "../../components/chatbot/ChatInput";
 import MessageBubble from "../../components/chatbot/MessageBubble";
 import { CHATBOT_BASE_URL } from "../../utils/api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const QUICK_ACTIONS = [
   "Library",
@@ -30,6 +31,7 @@ export default function ChatbotScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typing, setTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const insets = useSafeAreaInsets();
 
   const sendMessage = async (text: string) => {
     const userMsg: Message = { id: Date.now().toString(), text, isUser: true };
@@ -96,9 +98,11 @@ export default function ChatbotScreen() {
 
       {/* 3px top accent */}
       <View style={styles.topAccent} />
+      {/* Top-right ambient glow */}
+      <View style={styles.bgGlow} />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, 16) + 10 }]}>
         <View style={styles.headerLeft}>
           <View style={styles.headerIconBox}>
             <Ionicons name="navigate-outline" size={22} color={COLORS.primary} />
@@ -213,6 +217,11 @@ const styles = StyleSheet.create({
   topAccent: {
     height: 3,
     backgroundColor: COLORS.primary,
+  },
+  bgGlow: {
+    position: "absolute", top: -80, right: -80,
+    width: 260, height: 260, borderRadius: 130,
+    backgroundColor: COLORS.primary, opacity: 0.08,
   },
 
   // Header
