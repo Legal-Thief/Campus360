@@ -50,14 +50,14 @@ export const AuthProvider = ({ children }: any) => {
     await AsyncStorage.setItem("user", JSON.stringify(user));
     setToken(token);
     setUser(user);
-    // ✅ No router.replace() here — let RootNavigator handle routing
+    // No router.replace() here — let RootNavigator handle routing
   };
 
   const logout = async () => {
     await AsyncStorage.multiRemove(["token", "user"]);
     setToken(null);
     setUser(null);
-    // ✅ No router.replace() here — let RootNavigator handle routing
+    // No router.replace() here — let RootNavigator handle routing
   };
 
   return (

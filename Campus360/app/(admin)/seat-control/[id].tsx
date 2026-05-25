@@ -16,7 +16,7 @@ import API from "../../../utils/api";
 import { COLORS, RADIUS } from "../../../utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+//  Types 
 type RowItem = {
   id: string;
   type: "row";
@@ -37,7 +37,7 @@ type EditMode = "view" | "block" | "unblock" | "gap";
 let _uid = 100;
 const uid = () => `i${++_uid}`;
 
-// ─── Seat chip ────────────────────────────────────────────────────────────────
+//  Seat chip
 const SeatChip = ({
   col,
   label,
@@ -72,7 +72,7 @@ const SeatChip = ({
   );
 };
 
-// ─── Main component ───────────────────────────────────────────────────────────
+//  Main component 
 export default function SeatControlDetail() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -254,9 +254,8 @@ export default function SeatControlDetail() {
     }
   };
 
-  // ─────────────────────────────────────────────────────────────────────────────
   // LOADING
-  // ─────────────────────────────────────────────────────────────────────────────
+  
   if (loading) {
     return (
       <View style={styles.center}>
@@ -265,9 +264,8 @@ export default function SeatControlDetail() {
     );
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
   // DETAIL VIEW (existing auditorium)
-  // ─────────────────────────────────────────────────────────────────────────────
+  
   if (!isNew && auditorium) {
     const aud = auditorium;
     const total = aud.rows.length * aud.seatsPerRow;
@@ -386,9 +384,8 @@ export default function SeatControlDetail() {
     );
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
   // CREATE NEW — Cinema-style interactive builder
-  // ─────────────────────────────────────────────────────────────────────────────
+  
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       {/* Top accent + right vertical bar — admin screen rule */}
@@ -639,7 +636,7 @@ export default function SeatControlDetail() {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+// Styles
 const SEAT_W = 24;
 const SEAT_H = 20;
 

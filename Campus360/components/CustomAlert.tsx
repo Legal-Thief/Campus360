@@ -5,7 +5,7 @@ import { COLORS, FONT, RADIUS } from "../utils/theme";
 
 const { width } = Dimensions.get("window");
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+//  Types
 type AlertType = "error" | "success" | "warning" | "info" | "confirm";
 
 interface AlertConfig {
@@ -24,7 +24,7 @@ interface AlertContextType {
   hide: () => void;
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
+//  Context 
 const AlertContext = createContext<AlertContextType>({
   show: () => {},
   confirm: () => {},
@@ -33,7 +33,7 @@ const AlertContext = createContext<AlertContextType>({
 
 export const useAlert = () => useContext(AlertContext);
 
-// ─── Config per type ──────────────────────────────────────────────────────────
+//  Config per type
 const TYPE_CONFIG: Record<AlertType, { icon: string; iconColor: string; accentColor: string; accentBg: string }> = {
   error:   { icon: "close-circle-outline",    iconColor: COLORS.primary,  accentColor: COLORS.primary,  accentBg: COLORS.primaryGlow },
   success: { icon: "checkmark-circle-outline", iconColor: COLORS.success,  accentColor: COLORS.success,  accentBg: COLORS.successBg },
@@ -42,7 +42,7 @@ const TYPE_CONFIG: Record<AlertType, { icon: string; iconColor: string; accentCo
   confirm: { icon: "alert-circle-outline",     iconColor: COLORS.warning,  accentColor: COLORS.warning,  accentBg: COLORS.warningBg },
 };
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
+//  Provider 
 export function AlertProvider({ children }: { children: React.ReactNode }) {
   const [visible, setVisible] = useState(false);
   const [config, setConfig] = useState<AlertConfig & { isConfirm?: boolean }>({ title: "" });
@@ -143,7 +143,7 @@ export function AlertProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+//  Styles 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,

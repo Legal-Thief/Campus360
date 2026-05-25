@@ -9,7 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import API from "../../utils/api";
 import { COLORS, RADIUS } from "../../utils/theme";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+//  Types 
 type EventItem = {
   _id: string;
   title: string;
@@ -34,7 +34,7 @@ type UserResult = {
   role: string;
 };
 
-// ─── Status pill ──────────────────────────────────────────────────────────────
+//  Status pill 
 const STATUS_COLOR: Record<string, string> = {
   registration_open:   "#10b981",
   quiz_closed:         "#f59e0b",
@@ -51,16 +51,16 @@ const StatusPill = ({ status }: { status: string }) => (
   </View>
 );
 
-// ─── Role badge ───────────────────────────────────────────────────────────────
+//  Role badge 
 const RoleBadge = ({ role }: { role: string }) => (
   <View style={styles.roleBadge}>
     <Text style={styles.roleBadgeText}>{role}</Text>
   </View>
 );
 
-// =============================================================================
+
 // Main Screen
-// =============================================================================
+
 export default function ManageScannersScreen() {
   const router = useRouter();
 
@@ -80,7 +80,7 @@ export default function ManageScannersScreen() {
   const [searching, setSearching] = useState(false);
   const [adding, setAdding] = useState(false);
 
-  // ── Fetch all events ────────────────────────────────────────────────────────
+  //  Fetch all events
   const fetchEvents = useCallback(async () => {
     try {
       setEventsLoading(true);
@@ -95,7 +95,7 @@ export default function ManageScannersScreen() {
 
   useEffect(() => { fetchEvents(); }, [fetchEvents]);
 
-  // ── Fetch scanners for selected event ──────────────────────────────────────
+  //  Fetch scanners for selected event 
   const fetchScanners = useCallback(async (eventId: string) => {
     try {
       setScannersLoading(true);
@@ -113,7 +113,7 @@ export default function ManageScannersScreen() {
     fetchScanners(event._id);
   };
 
-  // ── Search users to add ────────────────────────────────────────────────────
+  //  Search users to add 
   const handleSearch = async () => {
     const q = searchQuery.trim();
     if (q.length < 2) {
@@ -132,7 +132,7 @@ export default function ManageScannersScreen() {
     }
   };
 
-  // ── Grant scanner access ───────────────────────────────────────────────────
+  //  Grant scanner access 
   const grantAccess = async (userId: string) => {
     if (!selectedEvent) return;
     try {
@@ -150,7 +150,7 @@ export default function ManageScannersScreen() {
     }
   };
 
-  // ── Revoke scanner access ──────────────────────────────────────────────────
+  //  Revoke scanner access 
   const revokeAccess = (scanner: ScannerEntry) => {
     Alert.alert(
       "Revoke Access",
@@ -173,11 +173,11 @@ export default function ManageScannersScreen() {
     );
   };
 
-  // ── Already-a-scanner guard ─────────────────────────────────────────────────
+  //  Already-a-scanner guard 
   const isAlreadyScanner = (userId: string) =>
     scanners.some((s) => s.userId._id === userId);
 
-  // ── Renders ────────────────────────────────────────────────────────────────
+  //  Renders 
 
   const renderEvent = ({ item }: { item: EventItem }) => {
     const isSelected = selectedEvent?._id === item._id;
@@ -252,7 +252,7 @@ export default function ManageScannersScreen() {
     );
   };
 
-  // ── Main layout ────────────────────────────────────────────────────────────
+  //  Main layout
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
@@ -408,9 +408,9 @@ export default function ManageScannersScreen() {
   );
 }
 
-// =============================================================================
+
 // Styles
-// =============================================================================
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   topAccent: {

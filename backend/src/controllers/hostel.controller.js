@@ -1,9 +1,9 @@
 import HostelRequest from "../models/HostelRequest.js";
 import User from "../models/User.js";
 
-// ========================
+
 // STUDENT: Raise a request
-// ========================
+
 export const createRequest = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -54,9 +54,9 @@ export const createRequest = async (req, res) => {
   }
 };
 
-// ========================
+
 // STUDENT: Get my requests
-// ========================
+
 export const getMyRequests = async (req, res) => {
   try {
     const requests = await HostelRequest.find({ requestedBy: req.user.id })
@@ -70,9 +70,9 @@ export const getMyRequests = async (req, res) => {
   }
 };
 
-// ========================
+
 // STUDENT: Cancel a pending request
-// ========================
+
 export const cancelRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -93,9 +93,9 @@ export const cancelRequest = async (req, res) => {
   }
 };
 
-// ========================
+
 // STUDENT: Offer to swap (respond to another student's swap request)
-// ========================
+
 export const offerSwap = async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -126,9 +126,9 @@ export const offerSwap = async (req, res) => {
   }
 };
 
-// ========================
+
 // WARDEN: Get all requests (with filters)
-// ========================
+
 export const getAllRequests = async (req, res) => {
   try {
     const { status, type } = req.query;
@@ -148,9 +148,9 @@ export const getAllRequests = async (req, res) => {
   }
 };
 
-// ========================
+
 // WARDEN: Approve or reject a request
-// ========================
+
 export const reviewRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -210,9 +210,9 @@ export const reviewRequest = async (req, res) => {
   }
 };
 
-// ========================
+
 // WARDEN: Get hostel summary (all hostellers)
-// ========================
+
 export const getHostelSummary = async (req, res) => {
   try {
     const hostellers = await User.find({ residentType: "hosteller" })
@@ -241,9 +241,9 @@ export const getHostelSummary = async (req, res) => {
   }
 };
 
-// ========================
+
 // WARDEN / ADMIN: Get open swap requests (for students to respond to)
-// ========================
+
 export const getOpenSwapRequests = async (req, res) => {
   try {
     const userId = req.user.id;

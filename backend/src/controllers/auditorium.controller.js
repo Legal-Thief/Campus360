@@ -1,8 +1,8 @@
 import Auditorium from "../models/Auditorium.js";
 
-// =======================
+
 // CREATE AUDITORIUM
-// =======================
+
 export const createAuditorium = async (req, res) => {
   try {
     const {
@@ -46,9 +46,9 @@ export const createAuditorium = async (req, res) => {
   }
 };
 
-// =======================
+
 // GET ALL AUDITORIUMS
-// =======================
+
 export const getAllAuditoriums = async (
   req,
   res
@@ -72,9 +72,9 @@ export const getAllAuditoriums = async (
   }
 };
 
-// =======================
+
 // GET ONE AUDITORIUM
-// =======================
+
 export const getAuditoriumById = async (
   req,
   res

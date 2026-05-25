@@ -9,7 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import API from "../../utils/api";
 import { COLORS, RADIUS } from "../../utils/theme";
 
-// ─── Config ────────────────────────────────────────────────────────────────
+// Config 
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; icon: string }> = {
   pending:  { color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  icon: "time-outline" },
@@ -22,11 +22,11 @@ const TYPE_CONFIG: Record<string, { color: string; bg: string }> = {
   found: { color: "#10b981", bg: "rgba(16,185,129,0.12)" },
 };
 
-// ─── Types ─────────────────────────────────────────────────────────────────
+//  Types
 
 type Tab = "pending" | "all" | "summary";
 
-// ─── Component ─────────────────────────────────────────────────────────────
+//  Component 
 
 export default function LostFoundAdminDashboard() {
   const { user, logout } = useAuth();
@@ -45,7 +45,7 @@ export default function LostFoundAdminDashboard() {
   const [adminNote, setAdminNote] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  // ── Fetch ────────────────────────────────────────────────────────────────
+  //  Fetch 
 
   useEffect(() => {
     fetchData();
@@ -79,7 +79,7 @@ export default function LostFoundAdminDashboard() {
     } catch {}
   };
 
-  // ── Review actions ───────────────────────────────────────────────────────
+  //  Review actions
 
   const openReview = (item: any, action: "approved" | "rejected") => {
     setSelected(item);
@@ -134,7 +134,7 @@ export default function LostFoundAdminDashboard() {
     );
   };
 
-  // ── Tabs ─────────────────────────────────────────────────────────────────
+  //  Tabs 
 
   const TABS = [
     { key: "pending", label: "Pending" },
@@ -142,7 +142,7 @@ export default function LostFoundAdminDashboard() {
     { key: "summary", label: "Summary" },
   ] as const;
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  //  Render
 
   return (
     <View style={styles.container}>
@@ -308,7 +308,7 @@ export default function LostFoundAdminDashboard() {
   );
 }
 
-// ─── Summary View ───────────────────────────────────────────────────────────
+//  Summary View
 
 function SummaryView({ stats }: { stats: any }) {
   const STAT_ITEMS = [
@@ -349,7 +349,7 @@ function SummaryView({ stats }: { stats: any }) {
   );
 }
 
-// ─── Item Card ──────────────────────────────────────────────────────────────
+//  Item Card
 
 function ItemCard({
   item,
@@ -463,7 +463,7 @@ function ItemCard({
   );
 }
 
-// ─── Styles ─────────────────────────────────────────────────────────────────
+//  Styles 
 
 const styles = StyleSheet.create({
   container: {

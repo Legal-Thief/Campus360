@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -12,6 +11,7 @@ import {
 import API from "../../utils/api";
 import { COLORS, FONT, RADIUS } from "../../utils/theme";
 import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system/legacy";
 
 export default function Reports() {
   const [events, setEvents] = useState<any[]>([]);
@@ -49,6 +49,63 @@ export default function Reports() {
     }
   };
 
+  const exportToExcel = async () => {
+    if (!report || !selectedEvent) return;
+
+    try {
+      const headers = ["S.No", "Student ID", "Name", "Email", "Seat No", "Status", "Attended"];
+
+      const rows = (report.bookings || []).map((b: any, i: number) => [
+        String(i + 1),
+        b.userId?.studentId || "N/A",
+        b.userId?.name || "Unknown",
+        b.userId?.email || "N/A",
+        b.seatNumber || "N/A",
+        (b.status || "N/A").replace(/_/g, " "),
+        b.status === "present" ? "Yes" : "No",
+      ]);
+
+      const escape = (val: string) => {
+        if (val.includes(",") || val.includes('"') || val.includes("\n")) {
+          return `"${val.replace(/"/g, '""')}"`;
+        }
+        return val;
+      };
+
+      const csvContent = [
+        headers.map(escape).join(","),
+        ...rows.map((row: string[]) => row.map(escape).join(",")),
+      ].join("\n");
+
+      const safeName = selectedEvent.title.replace(/[^a-zA-Z0-9_\-]/g, "_");
+      const fileName = `${safeName}_Attendance.csv`;
+
+      // Ask user to pick a folder (Downloads by default on Android)
+      const permissions =
+        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+      if (!permissions.granted) {
+        Alert.alert("Permission denied", "Please allow folder access to save the file.");
+        return;
+      }
+
+      // Create the file inside the chosen folder
+      const destUri = await FileSystem.StorageAccessFramework.createFileAsync(
+        permissions.directoryUri,
+        fileName,
+        "text/csv"
+      );
+
+      await FileSystem.writeAsStringAsync(destUri, csvContent, {
+        encoding: "utf8" as any,
+      });
+
+      Alert.alert("✓ Downloaded!", `${fileName} saved successfully.`);
+    } catch (e: any) {
+      Alert.alert("Export failed", e?.message || String(e));
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -75,10 +132,8 @@ export default function Reports() {
 
   return (
     <View style={styles.container}>
-      {/* Top accent + right vertical bar — admin screen rule */}
       <View style={styles.topAccent} />
       <View style={styles.rightBar} />
-      {/* Top-right ambient glow */}
       <View style={styles.bgGlow} />
       <Text style={styles.title}>Reports</Text>
       <Text style={styles.subtitle}>Select an event to view its full report</Text>
@@ -125,7 +180,10 @@ export default function Reports() {
       )}
 
       {report && !loadingReport && (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40 }}
+        >
           {/* Event info */}
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{report.event?.title}</Text>
@@ -142,12 +200,10 @@ export default function Reports() {
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>Seat Summary</Text>
             <StatusRow label="Total seats" value={report.seatStats.total} color={COLORS.textMuted} />
-            <StatusRow label="Booked" value={report.seatStats.booked} color={COLORS.primary }/>
+            <StatusRow label="Booked" value={report.seatStats.booked} color={COLORS.primary} />
             <StatusRow label="Available" value={report.seatStats.available} color="#10b981" />
             <StatusRow label="Blocked" value={report.seatStats.blocked} color="#64748b" />
             <StatusRow label="Locked (pending)" value={report.seatStats.locked} color="#f59e0b" />
-
-            {/* Visual fill bar */}
             <View style={styles.fillBarWrap}>
               <View
                 style={[
@@ -224,6 +280,12 @@ export default function Reports() {
           {!report.bookings?.length && (
             <Text style={styles.placeholderText}>No bookings yet.</Text>
           )}
+
+          {/* Export Button */}
+          <TouchableOpacity style={styles.exportBtn} onPress={exportToExcel}>
+            <Ionicons name="download-outline" size={18} color="#fff" />
+            <Text style={styles.exportBtnText}>Download Attendance CSV</Text>
+          </TouchableOpacity>
         </ScrollView>
       )}
     </View>
@@ -437,5 +499,21 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: "DMSans_600SemiBold",
     textTransform: "capitalize",
+  },
+  exportBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.card,
+    paddingVertical: 14,
+    marginTop: 12,
+    marginBottom: 40,
+  },
+  exportBtnText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "DMSans_600SemiBold",
   },
 });

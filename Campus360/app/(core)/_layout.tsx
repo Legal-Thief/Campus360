@@ -38,6 +38,8 @@ export default function CoreLayout() {
       <Tabs.Screen name="lost-found" options={{ href: null }} />
       <Tabs.Screen name="result/[id]" options={{ href: null }} />
       <Tabs.Screen name="seat-booking/[id]" options={{ href: null }} />
+      <Tabs.Screen name="waitlist/[id]" options={{ href: null }} />
+      <Tabs.Screen name="my-od/[id]"   options={{ href: null }} />
     </Tabs>
   );
 }

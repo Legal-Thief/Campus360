@@ -1,9 +1,9 @@
 import User from "../models/User.js";
 import Event from "../models/Event.js";
 
-// ========================
+
 // Admin Dashboard stats
-// ========================
+
 export const adminDashboard = async (req, res) => {
   try {
     const [totalUsers, totalEvents, hostellers, dayScholars] = await Promise.all([
@@ -32,9 +32,9 @@ export const adminDashboard = async (req, res) => {
   }
 };
 
-// ========================
+
 // Get all users
-// ========================
+
 export const getAllUsers = async (req, res) => {
   try {
     const { role, residentType, search } = req.query;
@@ -64,9 +64,9 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// ========================
+
 // Update user role (superadmin only)
-// ========================
+
 export const updateUserRole = async (req, res) => {
   try {
     const { id } = req.params;
@@ -98,9 +98,9 @@ export const updateUserRole = async (req, res) => {
   }
 };
 
-// ========================
+
 // Delete user (superadmin only)
-// ========================
+
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -121,9 +121,9 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// ========================
+
 // Get all events (admin view)
-// ========================
+
 export const getAllEventsForAdmin = async (req, res) => {
   try {
     const events = await Event.find()

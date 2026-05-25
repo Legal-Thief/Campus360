@@ -16,22 +16,22 @@ type ScanResult = {
 };
 
 const SCAN_COLORS: Record<string, string> = { entry: COLORS.success, exit: COLORS.warning, reentry: COLORS.primary };
-const SCAN_ICONS: Record<string, string>  = { entry: "log-in-outline", exit: "walk-outline", reentry: "refresh-outline" };
+const SCAN_ICONS: Record<string, string> = { entry: "log-in-outline", exit: "walk-outline", reentry: "refresh-outline" };
 const fmtTime = (iso?: string) => iso ? new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "—";
 
 export default function QRScannerScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const alert  = useAlert();
+  const alert = useAlert();
   const [permission, requestPermission] = useCameraPermissions();
-  const [events, setEvents]           = useState<EventOption[]>([]);
+  const [events, setEvents] = useState<EventOption[]>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<EventOption | null>(null);
-  const [scanning, setScanning]       = useState(false);
-  const [processing, setProcessing]   = useState(false);
-  const [result, setResult]           = useState<ScanResult | null>(null);
-  const [showManual, setShowManual]   = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [result, setResult] = useState<ScanResult | null>(null);
+  const [showManual, setShowManual] = useState(false);
   const [manualToken, setManualToken] = useState("");
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
 
@@ -57,7 +57,7 @@ export default function QRScannerScreen() {
     } finally { setProcessing(false); }
   };
 
-  const resetScan   = () => { setResult(null); setScanning(true); setManualToken(""); setShowManual(false); };
+  const resetScan = () => { setResult(null); setScanning(true); setManualToken(""); setShowManual(false); };
   const deselectEvent = () => { setSelectedEvent(null); setScanning(false); resetScan(); };
 
   if (!user) {
@@ -195,14 +195,14 @@ export default function QRScannerScreen() {
                 <Text style={[styles.resultStatus, { color: SCAN_COLORS[result.scanType!] }]}>{result.message}</Text>
                 <View style={styles.studentCard}>
                   {[
-                    { label: "NAME",       value: result.booking.studentName },
+                    { label: "NAME", value: result.booking.studentName },
                     { label: "STUDENT ID", value: result.booking.studentId },
-                    { label: "SEAT",       value: result.booking.seatNumber },
-                    { label: "EVENT",      value: result.booking.eventTitle },
-                    { label: "STATUS",     value: result.booking.status?.replace(/_/g, " ") },
-                    { label: "ENTRY",      value: fmtTime(result.booking.entryTime) },
-                    ...(result.booking.exitTime   ? [{ label: "BREAK OUT", value: fmtTime(result.booking.exitTime) }]    : []),
-                    ...(result.booking.reEntryTime? [{ label: "BREAK IN",  value: fmtTime(result.booking.reEntryTime) }] : []),
+                    { label: "SEAT", value: result.booking.seatNumber },
+                    { label: "EVENT", value: result.booking.eventTitle },
+                    { label: "STATUS", value: result.booking.status?.replace(/_/g, " ") },
+                    { label: "ENTRY", value: fmtTime(result.booking.entryTime) },
+                    ...(result.booking.exitTime ? [{ label: "BREAK OUT", value: fmtTime(result.booking.exitTime) }] : []),
+                    ...(result.booking.reEntryTime ? [{ label: "BREAK IN", value: fmtTime(result.booking.reEntryTime) }] : []),
                   ].map((row) => (
                     <View key={row.label} style={styles.studentRow}>
                       <Text style={styles.studentLabel}>{row.label}</Text>
@@ -266,12 +266,12 @@ const InfoBox = ({ icon, title, sub }: { icon: any; title: string; sub: string }
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   topAccent: { height: 3, backgroundColor: COLORS.primary },
-  bgGlow:    { position: "absolute", top: -80, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: COLORS.primary, opacity: 0.07 },
+  bgGlow: { position: "absolute", top: -80, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: COLORS.primary, opacity: 0.07 },
 
-  header:    { flexDirection: "row", alignItems: "center", gap: 14, paddingTop: 56, paddingHorizontal: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  backBtn:   { width: 38, height: 38, borderRadius: 10, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border, justifyContent: "center", alignItems: "center" },
+  header: { flexDirection: "row", alignItems: "center", gap: 14, paddingTop: 56, paddingHorizontal: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  backBtn: { width: 38, height: 38, borderRadius: 10, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border, justifyContent: "center", alignItems: "center" },
   headerTitle: { color: COLORS.textPrimary, fontSize: 20, fontFamily: FONT.extraBold },
-  headerSub:   { color: COLORS.textMuted, fontSize: 12, fontFamily: FONT.regular, marginTop: 2 },
+  headerSub: { color: COLORS.textMuted, fontSize: 12, fontFamily: FONT.regular, marginTop: 2 },
 
   infoStrip: { flexDirection: "row", alignItems: "center", gap: 8, margin: 16, backgroundColor: COLORS.primaryGlow, borderRadius: 10, padding: 12, borderWidth: 1, borderColor: COLORS.primaryBorder },
   infoStripText: { color: COLORS.primary, fontSize: 12, fontFamily: FONT.medium, flex: 1 },
@@ -279,48 +279,48 @@ const styles = StyleSheet.create({
   eventCard: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: COLORS.surface, borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: COLORS.border },
   eventCardIcon: { width: 42, height: 42, borderRadius: 12, backgroundColor: COLORS.primaryGlow, borderWidth: 1, borderColor: COLORS.primaryBorder, justifyContent: "center", alignItems: "center" },
   eventCardTitle: { color: COLORS.textPrimary, fontSize: 14, fontFamily: FONT.bold },
-  clubRow:        { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 3 },
-  clubName:       { color: COLORS.primary, fontSize: 11, fontFamily: FONT.semiBold },
-  eventCardMeta:  { color: COLORS.textMuted, fontSize: 12, fontFamily: FONT.regular, marginTop: 4 },
+  clubRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 3 },
+  clubName: { color: COLORS.primary, fontSize: 11, fontFamily: FONT.semiBold },
+  eventCardMeta: { color: COLORS.textMuted, fontSize: 12, fontFamily: FONT.regular, marginTop: 4 },
 
   cameraWrap: { borderRadius: 20, overflow: "hidden", height: 340, marginBottom: 20 },
-  camera:     { flex: 1 },
-  overlay:    { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.45)", gap: 16 },
-  scanFrame:  { width: 220, height: 220, borderWidth: 2, borderColor: COLORS.primary, borderRadius: 16, backgroundColor: "transparent" },
-  scanHint:   { color: "rgba(255,255,255,0.7)", fontSize: 13, fontFamily: FONT.medium },
+  camera: { flex: 1 },
+  overlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.45)", gap: 16 },
+  scanFrame: { width: 220, height: 220, borderWidth: 2, borderColor: COLORS.primary, borderRadius: 16, backgroundColor: "transparent" },
+  scanHint: { color: "rgba(255,255,255,0.7)", fontSize: 13, fontFamily: FONT.medium },
 
-  processingBox:  { alignItems: "center", paddingVertical: 60, gap: 16 },
+  processingBox: { alignItems: "center", paddingVertical: 60, gap: 16 },
   processingText: { color: COLORS.textMuted, fontSize: 15, fontFamily: FONT.medium },
 
-  resultBox:    { alignItems: "center", gap: 16, paddingBottom: 20 },
-  resultIcon:   { width: 80, height: 80, borderRadius: 40, justifyContent: "center", alignItems: "center" },
+  resultBox: { alignItems: "center", gap: 16, paddingBottom: 20 },
+  resultIcon: { width: 80, height: 80, borderRadius: 40, justifyContent: "center", alignItems: "center" },
   resultStatus: { fontSize: 20, fontFamily: FONT.bold, textAlign: "center" },
-  resultError:  { color: COLORS.textMuted, fontSize: 14, fontFamily: FONT.regular, textAlign: "center" },
+  resultError: { color: COLORS.textMuted, fontSize: 14, fontFamily: FONT.regular, textAlign: "center" },
 
-  studentCard:  { backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 18, width: "100%", gap: 12 },
-  studentRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  studentCard: { backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 18, width: "100%", gap: 12 },
+  studentRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   studentLabel: { color: COLORS.textMuted, fontSize: 11, fontFamily: FONT.bold, letterSpacing: 1.5 },
   studentValue: { color: COLORS.textPrimary, fontSize: 14, fontFamily: FONT.semiBold },
 
-  resetBtn:     { backgroundColor: COLORS.primary, flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12 },
+  resetBtn: { backgroundColor: COLORS.primary, flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12 },
   resetBtnText: { color: "#fff", fontSize: 15, fontFamily: FONT.bold },
 
   manualSection: { marginTop: 8, gap: 10 },
-  manualToggle:  { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "center" },
+  manualToggle: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "center" },
   manualToggleText: { color: COLORS.primary, fontSize: 13, fontFamily: FONT.semiBold },
-  manualRow:    { flexDirection: "row", gap: 10 },
-  manualInput:  { flex: 1, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border, borderRadius: 10, padding: 12, color: COLORS.textPrimary, fontSize: 13, fontFamily: FONT.regular },
+  manualRow: { flexDirection: "row", gap: 10 },
+  manualInput: { flex: 1, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border, borderRadius: 10, padding: 12, color: COLORS.textPrimary, fontSize: 13, fontFamily: FONT.regular },
   manualSubmit: { backgroundColor: COLORS.primary, borderRadius: 10, paddingHorizontal: 18, justifyContent: "center" },
   manualSubmitText: { color: "#fff", fontFamily: FONT.bold, fontSize: 14 },
 
-  permissionBox:   { alignItems: "center", paddingVertical: 60, gap: 16 },
+  permissionBox: { alignItems: "center", paddingVertical: 60, gap: 16 },
   permissionTitle: { color: COLORS.textPrimary, fontSize: 20, fontFamily: FONT.bold },
-  permissionSub:   { color: COLORS.textMuted, fontSize: 14, fontFamily: FONT.regular, textAlign: "center", lineHeight: 22 },
-  permissionBtn:   { backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12 },
+  permissionSub: { color: COLORS.textMuted, fontSize: 14, fontFamily: FONT.regular, textAlign: "center", lineHeight: 22 },
+  permissionBtn: { backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12 },
   permissionBtnText: { color: "#fff", fontSize: 15, fontFamily: FONT.bold },
 
   emptyState: { flex: 1, justifyContent: "center", alignItems: "center", padding: 48, gap: 12 },
-  emptyIcon:  { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.primaryGlow, borderWidth: 1, borderColor: COLORS.primaryBorder, justifyContent: "center", alignItems: "center" },
+  emptyIcon: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.primaryGlow, borderWidth: 1, borderColor: COLORS.primaryBorder, justifyContent: "center", alignItems: "center" },
   emptyTitle: { color: COLORS.textPrimary, fontSize: 18, fontFamily: FONT.bold, textAlign: "center" },
-  emptySub:   { color: COLORS.textMuted, fontSize: 14, fontFamily: FONT.regular, textAlign: "center", lineHeight: 22 },
+  emptySub: { color: COLORS.textMuted, fontSize: 14, fontFamily: FONT.regular, textAlign: "center", lineHeight: 22 },
 });

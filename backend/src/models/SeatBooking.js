@@ -37,12 +37,16 @@ const seatBookingSchema = new mongoose.Schema(
     },
 
     // Entry/exit timestamps (QR scan events)
-    entryTime: { type: Date, default: null },
-    exitTime: { type: Date, default: null },     // break start
-    reEntryTime: { type: Date, default: null },   // break end
+    entryTime:   { type: Date, default: null },
+    exitTime:    { type: Date, default: null },    // break start
+    reEntryTime: { type: Date, default: null },    // break end
 
     // Whether the one allowed break has been used
     breakUsed: { type: Boolean, default: false },
+
+    // OD / Attendance tracking (Feature 3)
+    attendedMinutes: { type: Number, default: 0 },
+    odIssued:        { type: Boolean, default: false },
   },
   { timestamps: true }
 );

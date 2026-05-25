@@ -1,13 +1,11 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// ── Main Campus360 backend ──────────────────────────────────────────────────
-// Change this IP to your machine's local IP when running on a physical device
-export const MAIN_API_BASE = "http://10.20.41.36:5000/api";
+//  Main Campus360 backend
+export const MAIN_API_BASE ="https://campus360-backend-coxr.onrender.com/api";
 
-// ── Campus Navigation Chatbot backend ──────────────────────────────────────
-// Change this IP to your teammate's machine IP (or same machine if merged)
-export const CHATBOT_BASE_URL = "http://10.20.41.36:5000";
+//  Campus Navigation Chatbot backend
+export const CHATBOT_BASE_URL = "https://campus360-backend-coxr.onrender.com";
 
 const API = axios.create({
   baseURL: MAIN_API_BASE,

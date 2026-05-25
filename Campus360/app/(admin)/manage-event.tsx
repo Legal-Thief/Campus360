@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  ActivityIndicator, Alert, Modal, StatusBar,
+  ActivityIndicator, Alert, Modal, StatusBar, TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
 import API from "../../utils/api";
@@ -26,12 +26,15 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
 
 export default function ManageEvent() {
   const router = useRouter();
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [events, setEvents]                   = useState<any[]>([]);
+  const [loading, setLoading]                 = useState(true);
+  const [selectedEvent, setSelectedEvent]     = useState<any>(null);
+  const [modalVisible, setModalVisible]       = useState(false);
+  const [odModalVisible, setOdModalVisible]   = useState(false);
+  const [updatingStatus, setUpdatingStatus]   = useState(false);
   const [generatingPriority, setGeneratingPriority] = useState(false);
+  const [finalizing, setFinalizing]           = useState(false);
+  const [eventEndTime, setEventEndTime]       = useState("");
 
   useEffect(() => { fetchEvents(); }, []);
 
@@ -74,6 +77,39 @@ export default function ManageEvent() {
     } catch { Alert.alert("Error", "Failed to process expired seats"); }
   };
 
+  const openODModal = (event: any) => {
+    setSelectedEvent(event);
+    // Pre-fill with event date + 2 hours as a sensible default
+    const defaultEnd = new Date(event.date);
+    defaultEnd.setHours(defaultEnd.getHours() + 2);
+    setEventEndTime(defaultEnd.toISOString().slice(0, 16)); // "YYYY-MM-DDTHH:mm"
+    setOdModalVisible(true);
+  };
+
+  const handleFinalizeAttendance = async () => {
+    if (!selectedEvent || !eventEndTime) {
+      Alert.alert("Required", "Please enter the event end time");
+      return;
+    }
+    try {
+      setFinalizing(true);
+      const res = await API.post(`/events/${selectedEvent._id}/finalize-attendance`, {
+        eventEndTime: new Date(eventEndTime).toISOString(),
+      });
+      const d = res.data;
+      Alert.alert(
+        "Attendance Finalized",
+        `${d.processed} students processed.\n` +
+        `Event duration: ${d.totalEventMinutes} mins.\n` +
+        `OD threshold: ${d.odThresholdMinutes} mins (50%).\n` +
+        `OD issued to: ${d.odIssued} student(s).`
+      );
+      setOdModalVisible(false);
+    } catch (error: any) {
+      Alert.alert("Error", error?.response?.data?.message || "Finalization failed");
+    } finally { setFinalizing(false); }
+  };
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -86,9 +122,7 @@ export default function ManageEvent() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <View style={styles.topAccent} />
-      {/* Right vertical bar — admin screen rule */}
       <View style={styles.rightBar} />
-      {/* Top-right ambient glow */}
       <View style={styles.bgGlow} />
 
       <View style={styles.header}>
@@ -124,13 +158,23 @@ export default function ManageEvent() {
                   <Text style={styles.metaText}>{item.quiz?.questions?.length || 0} questions</Text>
                 </View>
 
+                {/* Row 1: core actions */}
                 <View style={styles.actionRow}>
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => { setSelectedEvent(item); setModalVisible(true); }} activeOpacity={0.8}>
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => { setSelectedEvent(item); setModalVisible(true); }}
+                    activeOpacity={0.8}
+                  >
                     <Ionicons name="settings-outline" size={13} color={COLORS.primary} />
                     <Text style={styles.actionBtnText}>Status</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleGeneratePriority(item._id)} disabled={generatingPriority} activeOpacity={0.8}>
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => handleGeneratePriority(item._id)}
+                    disabled={generatingPriority}
+                    activeOpacity={0.8}
+                  >
                     <Ionicons name="trophy-outline" size={13} color={COLORS.warning} />
                     <Text style={[styles.actionBtnText, { color: COLORS.warning }]}>Priority</Text>
                   </TouchableOpacity>
@@ -144,9 +188,52 @@ export default function ManageEvent() {
                     <Text style={[styles.actionBtnText, { color: COLORS.success }]}>Analytics</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleProcessExpired(item._id)} activeOpacity={0.8}>
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => handleProcessExpired(item._id)}
+                    activeOpacity={0.8}
+                  >
                     <Ionicons name="refresh-outline" size={13} color={COLORS.primary} />
                     <Text style={styles.actionBtnText}>Expire</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Row 2: new feature actions */}
+                <View style={[styles.actionRow, { marginTop: 6 }]}>
+                  {/* Waitlist */}
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.actionBtnNew]}
+                    onPress={() => router.push({
+                      pathname: "/(admin)/waitlist",
+                      params: { eventId: item._id, eventTitle: item.title },
+                    })}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="list-outline" size={13} color={COLORS.info} />
+                    <Text style={[styles.actionBtnText, { color: COLORS.info }]}>Waitlist</Text>
+                  </TouchableOpacity>
+
+                  {/* Finalize Attendance / OD */}
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.actionBtnNew]}
+                    onPress={() => openODModal(item)}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="ribbon-outline" size={13} color={COLORS.success} />
+                    <Text style={[styles.actionBtnText, { color: COLORS.success }]}>Issue OD</Text>
+                  </TouchableOpacity>
+
+                  {/* Report */}
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.actionBtnNew]}
+                    onPress={() => router.push({
+                      pathname: "/(admin)/reports",
+                      params: { eventId: item._id },
+                    })}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="document-text-outline" size={13} color={COLORS.textMuted} />
+                    <Text style={[styles.actionBtnText, { color: COLORS.textMuted }]}>Report</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -164,7 +251,7 @@ export default function ManageEvent() {
         }
       />
 
-      {/* Status Change Modal */}
+      {/* ── Status Change Modal ────────────────────────────────────── */}
       <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
@@ -204,55 +291,102 @@ export default function ManageEvent() {
           </View>
         </View>
       </Modal>
+
+      {/* ── OD / Finalize Attendance Modal ────────────────────────── */}
+      <Modal visible={odModalVisible} transparent animationType="slide" onRequestClose={() => setOdModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <View>
+                <Text style={styles.modalTitle}>Finalize Attendance</Text>
+                <Text style={styles.modalSub} numberOfLines={1}>{selectedEvent?.title}</Text>
+              </View>
+              <TouchableOpacity style={styles.closeBtn} onPress={() => setOdModalVisible(false)}>
+                <Ionicons name="close" size={18} color={COLORS.textPrimary} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.divider} />
+
+            <Text style={styles.odLabel}>EVENT END TIME</Text>
+            <TextInput
+              style={styles.odInput}
+              value={eventEndTime}
+              onChangeText={setEventEndTime}
+              placeholder="YYYY-MM-DDTHH:mm  e.g. 2025-08-10T17:00"
+              placeholderTextColor={COLORS.textDim}
+              autoCapitalize="none"
+            />
+            <Text style={styles.odHint}>
+              OD is issued to students who attended ≥ 50% of the event. This calculates attendance
+              for ALL bookings and cannot be undone easily.
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.odConfirmBtn, finalizing && { opacity: 0.6 }]}
+              onPress={handleFinalizeAttendance}
+              disabled={finalizing}
+              activeOpacity={0.85}
+            >
+              {finalizing
+                ? <ActivityIndicator size="small" color="#fff" />
+                : <Text style={styles.odConfirmText}>Confirm &amp; Issue OD</Text>
+              }
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.cancelModalBtn} onPress={() => setOdModalVisible(false)}>
+              <Text style={styles.cancelModalText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background, paddingHorizontal: 20, paddingTop: 60 },
-  topAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3, backgroundColor: COLORS.primary },
-  rightBar: {
-    position: "absolute", top: 0, right: 0,
-    width: 3, height: 120,
-    backgroundColor: COLORS.primary, opacity: 0.5,
-  },
-  bgGlow: {
-    position: "absolute", top: -80, right: -80,
-    width: 240, height: 240, borderRadius: 120,
-    backgroundColor: COLORS.primary, opacity: 0.07,
-  },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.background },
-  header: { marginBottom: 16 },
-  title: { color: COLORS.textPrimary, fontSize: 32, fontFamily: FONT.extraBold },
-  subtitle: { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular, marginTop: 4 },
-  card: { flexDirection: "row", backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.border, marginBottom: 12, overflow: "hidden" },
-  statusStrip: { width: 4 },
-  cardInner: { flex: 1, padding: 14 },
+  container:  { flex: 1, backgroundColor: COLORS.background, paddingHorizontal: 20, paddingTop: 60 },
+  topAccent:  { position: "absolute", top: 0, left: 0, right: 0, height: 3, backgroundColor: COLORS.primary },
+  rightBar:   { position: "absolute", top: 0, right: 0, width: 3, height: 120, backgroundColor: COLORS.primary, opacity: 0.5 },
+  bgGlow:     { position: "absolute", top: -80, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: COLORS.primary, opacity: 0.07 },
+  center:     { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.background },
+  header:     { marginBottom: 16 },
+  title:      { color: COLORS.textPrimary, fontSize: 32, fontFamily: FONT.extraBold },
+  subtitle:   { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular, marginTop: 4 },
+  card:       { flexDirection: "row", backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.border, marginBottom: 12, overflow: "hidden" },
+  statusStrip:{ width: 4 },
+  cardInner:  { flex: 1, padding: 14 },
   cardHeader: { flexDirection: "row", alignItems: "flex-start", gap: 10, marginBottom: 8 },
-  cardTitle: { color: COLORS.textPrimary, fontSize: 16, fontFamily: FONT.bold },
-  cardVenue: { color: COLORS.textMuted, fontSize: 12, fontFamily: FONT.regular, marginTop: 2 },
-  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: RADIUS.chip, alignSelf: "flex-start" },
+  cardTitle:  { color: COLORS.textPrimary, fontSize: 16, fontFamily: FONT.bold },
+  cardVenue:  { color: COLORS.textMuted, fontSize: 12, fontFamily: FONT.regular, marginTop: 2 },
+  statusBadge:{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: RADIUS.chip, alignSelf: "flex-start" },
   statusText: { fontSize: 10, fontFamily: FONT.bold, letterSpacing: 0.5 },
-  metaRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 12 },
-  metaText: { color: COLORS.textMuted, fontSize: 11, fontFamily: FONT.regular, marginRight: 6 },
-  actionRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  actionBtn: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.xs, paddingHorizontal: 10, paddingVertical: 7 },
+  metaRow:    { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 12 },
+  metaText:   { color: COLORS.textMuted, fontSize: 11, fontFamily: FONT.regular, marginRight: 6 },
+  actionRow:  { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  actionBtn:  { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.xs, paddingHorizontal: 10, paddingVertical: 7 },
+  actionBtnNew: { borderColor: COLORS.borderBright },
   actionBtnText: { color: COLORS.primary, fontSize: 11, fontFamily: FONT.semiBold },
-  empty: { alignItems: "center", paddingTop: 80, gap: 12 },
-  emptyIcon: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.primaryGlow, borderWidth: 1, borderColor: COLORS.primaryBorder, justifyContent: "center", alignItems: "center" },
-  emptyTitle: { color: COLORS.textPrimary, fontSize: 17, fontFamily: FONT.bold },
-  emptyText: { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular },
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.75)", justifyContent: "flex-end" },
-  modalCard: { backgroundColor: COLORS.surface, borderTopLeftRadius: 24, borderTopRightRadius: 24, borderWidth: 1, borderColor: COLORS.borderBright, borderBottomWidth: 0, padding: 22, paddingTop: 12, paddingBottom: 40 },
+  empty:       { alignItems: "center", paddingTop: 80, gap: 12 },
+  emptyIcon:   { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.primaryGlow, borderWidth: 1, borderColor: COLORS.primaryBorder, justifyContent: "center", alignItems: "center" },
+  emptyTitle:  { color: COLORS.textPrimary, fontSize: 17, fontFamily: FONT.bold },
+  emptyText:   { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular },
+  modalOverlay:{ flex: 1, backgroundColor: "rgba(0,0,0,0.75)", justifyContent: "flex-end" },
+  modalCard:   { backgroundColor: COLORS.surface, borderTopLeftRadius: 24, borderTopRightRadius: 24, borderWidth: 1, borderColor: COLORS.borderBright, borderBottomWidth: 0, padding: 22, paddingTop: 12, paddingBottom: 40 },
   modalHandle: { width: 40, height: 4, backgroundColor: COLORS.borderBright, borderRadius: 2, alignSelf: "center", marginBottom: 16 },
   modalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 },
-  modalTitle: { color: COLORS.textPrimary, fontSize: 18, fontFamily: FONT.bold },
-  modalSub: { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular, marginTop: 2 },
-  closeBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: COLORS.surfaceHigh, borderWidth: 1, borderColor: COLORS.border, justifyContent: "center", alignItems: "center" },
-  divider: { height: 1, backgroundColor: COLORS.border, marginVertical: 16 },
-  statusOption: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 14, paddingHorizontal: 12, borderRadius: RADIUS.md, marginBottom: 6 },
-  statusDot: { width: 9, height: 9, borderRadius: 5 },
-  statusOptionText: { flex: 1, color: COLORS.textMuted, fontSize: 15, fontFamily: FONT.medium },
-  cancelModalBtn: { marginTop: 8, alignItems: "center", paddingVertical: 14 },
+  modalTitle:  { color: COLORS.textPrimary, fontSize: 18, fontFamily: FONT.bold },
+  modalSub:    { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.regular, marginTop: 2 },
+  closeBtn:    { width: 34, height: 34, borderRadius: 17, backgroundColor: COLORS.surfaceHigh, borderWidth: 1, borderColor: COLORS.border, justifyContent: "center", alignItems: "center" },
+  divider:     { height: 1, backgroundColor: COLORS.border, marginVertical: 16 },
+  statusOption:    { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 14, paddingHorizontal: 12, borderRadius: RADIUS.md, marginBottom: 6 },
+  statusDot:       { width: 9, height: 9, borderRadius: 5 },
+  statusOptionText:{ flex: 1, color: COLORS.textMuted, fontSize: 15, fontFamily: FONT.medium },
+  cancelModalBtn:  { marginTop: 8, alignItems: "center", paddingVertical: 14 },
   cancelModalText: { color: COLORS.primary, fontSize: 14, fontFamily: FONT.semiBold },
+  odLabel:   { color: COLORS.textMuted, fontSize: 10, fontFamily: FONT.bold, letterSpacing: 2, marginBottom: 8 },
+  odInput:   { backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.sm, paddingHorizontal: 14, paddingVertical: 12, color: COLORS.textPrimary, fontFamily: FONT.medium, fontSize: 14, marginBottom: 10 },
+  odHint:    { color: COLORS.textMuted, fontSize: 12, fontFamily: FONT.regular, lineHeight: 18, marginBottom: 18 },
+  odConfirmBtn:  { backgroundColor: COLORS.primary, paddingVertical: 14, borderRadius: RADIUS.button, alignItems: "center" },
+  odConfirmText: { color: "#fff", fontFamily: FONT.bold, fontSize: 15 },
 });

@@ -7,6 +7,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 
+// Cron jobs
+import { startBreakExpiryCron } from "./cron/breakExpiry.js";
+
 // Routes
 import authRoutes from "./routes/auth.routes.js";
 import eventRoutes from "./routes/event.routes.js";
@@ -24,32 +27,30 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set("trust proxy", 1);
 
-// ── Security headers ───────────────────────────────────────────────────────
+// Security headers 
 app.use(helmet({
-  // Allow images to be served and loaded cross-origin (needed for chatbot images)
   crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 
-// ── CORS ───────────────────────────────────────────────────────────────────
+//  CORS 
 app.use(cors({
-  origin: process.env.CLIENT_URL || "*",
+  origin: process.env.CORS_ORIGIN || "*",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// ── Static file serving: campus navigation images ─────────────────────────
-// Place campus images in: src/uploads/campusImages/
-// They will be served at: GET /images/<filename>
+//  Static file serving: campus navigation images 
 app.use(
   "/images",
   express.static(path.join(__dirname, "uploads", "campusImages"))
 );
 
-// ── Body parser ────────────────────────────────────────────────────────────
+//  Body parser 
 app.use(express.json({ limit: "10kb" }));
 
-// ── NoSQL injection sanitization ──────────────────────────────────────────
+//  NoSQL injection sanitization 
 app.use((req, res, next) => {
   const sanitize = (obj) => {
     if (obj && typeof obj === "object") {
@@ -67,39 +68,42 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Global rate limiter ────────────────────────────────────────────────────
+//  Global rate limiter 
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
   message: { success: false, message: "Too many requests, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false }, // suppress proxy validation warning
 });
 app.use(globalLimiter);
 
-// ── Auth rate limiter ──────────────────────────────────────────────────────
+//  Auth rate limiter 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
   message: { success: false, message: "Too many auth attempts, please try again after 15 minutes." },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false }, // suppress proxy validation warning
 });
 
-// ── Routes ─────────────────────────────────────────────────────────────────
+//  Routes 
 app.use("/api/auth",        authLimiter, authRoutes);
 app.use("/api/events",      eventRoutes);
 app.use("/api/auditoriums", auditoriumRoutes);
 app.use("/api/hostel",      hostelRoutes);
 app.use("/api/admin",       adminRoutes);
-app.use("/api",             chatRoutes);  
-app.use("/api/lost-found", lostFoundRoutes);
-// ── Health check ───────────────────────────────────────────────────────────
+app.use("/api",             chatRoutes);
+app.use("/api/lost-found",  lostFoundRoutes);
+
+//  Health check 
 app.get("/", (req, res) => {
   res.send("Campus360 Backend Running ✓");
 });
 
-// ── Global error handler ───────────────────────────────────────────────────
+//  Global error handler 
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
@@ -108,7 +112,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-
-// ── Start server ───────────────────────────────────────────────────────────
+//  Start server 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Campus360 server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Campus360 server running on port ${PORT}`);
+  // Start background cron jobs
+  startBreakExpiryCron();
+});

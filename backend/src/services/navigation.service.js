@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
 const campusData = require("../data/campusdata.json");
 
-// ================= KEYWORD MAP =================
+//  KEYWORD MAP 
 const keywordMap = {
   "library":               "tagore_library",
   "tagore library":        "tagore_library",
@@ -60,7 +60,7 @@ const keywordMap = {
 
 const normalizeText = (text) => text.toLowerCase().trim();
 
-// ================= DESTINATION DETECTOR =================
+//  DESTINATION DETECTOR 
 const detectDestination = (message) => {
   const msg = normalizeText(message);
   for (const key in keywordMap) {
@@ -71,7 +71,7 @@ const detectDestination = (message) => {
   return null;
 };
 
-// ================= BFS PATH FINDER =================
+//  BFS PATH FINDER 
 const findPath = (start, destination, locations) => {
   const queue = [[start]];
   const visited = new Set();
@@ -100,7 +100,7 @@ const findPath = (start, destination, locations) => {
   return null;
 };
 
-// ================= MAIN EXPORT =================
+//  MAIN EXPORT 
 export const getDirections = (message) => {
   const destination = detectDestination(message);
   const locations = campusData.locations;

@@ -1,0 +1,75 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Metro
+.metro-health-check*
+
+# build folders
+dist/
+build/
+coverage/
+
+# cache
+.cache/
+.expo/
+.expo-shared/
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+
+# windows
+Thumbs.db
+
+# security
+*.pem
+
+# typescript
+*.tsbuildinfo
+
+# IDEs
+.vscode/
+.idea/
+
+# app example
+app-example/
+
+# generated native folders
+/ios
+/android
+
+# uploads/temp files
+tmp/
+temp/
+uploads/
+
+# database files
+*.sqlite
+*.db
+
+# misc
+*.zip
+*.tar
+*.gz

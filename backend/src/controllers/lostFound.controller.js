@@ -1,9 +1,9 @@
 import LostFoundItem from "../models/LostFoundItem.js";
 
-// ========================
+
 // POST /api/lost-found/add
 // Any authenticated user
-// ========================
+
 export const addItem = async (req, res) => {
   try {
     const {
@@ -34,10 +34,10 @@ export const addItem = async (req, res) => {
   }
 };
 
-// ========================
+
 // GET /api/lost-found/lost
 // Public - approved lost items
-// ========================
+
 export const getLostItems = async (req, res) => {
   try {
     const { category, search } = req.query;
@@ -53,10 +53,10 @@ export const getLostItems = async (req, res) => {
   }
 };
 
-// ========================
+
 // GET /api/lost-found/found
 // Public - approved found items
-// ========================
+
 export const getFoundItems = async (req, res) => {
   try {
     const { category, search } = req.query;
@@ -72,10 +72,10 @@ export const getFoundItems = async (req, res) => {
   }
 };
 
-// ========================
+
 // GET /api/lost-found/all
 // Admin only - all items
-// ========================
+
 export const getAllItems = async (req, res) => {
   try {
     const { status, type } = req.query;
@@ -94,10 +94,10 @@ export const getAllItems = async (req, res) => {
   }
 };
 
-// ========================
+
 // PUT /api/lost-found/status/:id
 // Admin only
-// ========================
+
 export const updateStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -121,10 +121,10 @@ export const updateStatus = async (req, res) => {
   }
 };
 
-// ========================
+
 // PUT /api/lost-found/resolve/:id
 // Admin only
-// ========================
+
 export const resolveItem = async (req, res) => {
   try {
     const { id } = req.params;
@@ -143,10 +143,10 @@ export const resolveItem = async (req, res) => {
   }
 };
 
-// ========================
+
 // GET /api/lost-found/stats
 // Admin only
-// ========================
+
 export const getStats = async (req, res) => {
   try {
     const [total, pending, approved, resolved, lostCount, foundCount] = await Promise.all([

@@ -55,7 +55,7 @@ export default function ResultScreen() {
 
   const canBook = !data.booking && data.slotStart && new Date() >= new Date(data.slotStart);
 
-  // ── QR / Ticket view ──
+  //  QR / Ticket view 
   if (data.booking) {
     const b = data.booking;
     const scanStatus: Record<string, { label: string; color: string }> = {
@@ -126,11 +126,22 @@ export default function ResultScreen() {
         )}
 
         <Text style={styles.qrHint}>Show this QR code at the entry gate to confirm your seat.</Text>
+
+        {/* OD Status Link */}
+        <TouchableOpacity
+          style={styles.odLink}
+          onPress={() => router.push(`/(core)/my-od/${id}`)}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="ribbon-outline" size={16} color={COLORS.success} />
+          <Text style={styles.odLinkText}>View OD / Attendance Status</Text>
+          <Ionicons name="chevron-forward" size={14} color={COLORS.success} />
+        </TouchableOpacity>
       </ScrollView>
     );
   }
 
-  // ── Result / score view ──
+  //  Result / score view
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, 20) + 16 }]}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
@@ -196,6 +207,18 @@ export default function ResultScreen() {
             : "Slot not assigned yet. Admin will generate priority soon."}
         </Text>
       )}
+
+      {/* Waitlist button — shown when slot is active but booking not yet possible (seats full) */}
+      {data.slotStart && (
+        <TouchableOpacity
+          style={styles.waitlistBtn}
+          onPress={() => router.push(`/(core)/waitlist/${id}`)}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="list-outline" size={16} color={COLORS.textMuted} />
+          <Text style={styles.waitlistBtnText}>Join Waitlist (if seats are full)</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -256,4 +279,8 @@ const styles = StyleSheet.create({
   infoValue:    { color: COLORS.textPrimary, fontSize: 14, fontFamily: FONT.semiBold },
   mono:         { fontFamily: "monospace", fontSize: 12 },
   qrHint:       { color: COLORS.textDim, fontSize: 12, fontFamily: FONT.regular, textAlign: "center", marginTop: 8, lineHeight: 18 },
+  odLink:       { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: COLORS.successBg, borderWidth: 1, borderColor: COLORS.successBorder, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 13, width: "100%", marginTop: 4 },
+  odLinkText:   { color: COLORS.success, fontSize: 13, fontFamily: FONT.semiBold, flex: 1 },
+  waitlistBtn:  { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 13, marginTop: 10 },
+  waitlistBtnText: { color: COLORS.textMuted, fontSize: 13, fontFamily: FONT.medium, flex: 1 },
 });
