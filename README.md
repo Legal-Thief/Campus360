@@ -93,8 +93,8 @@
 - QR-based event check-in and seat verification
 - Scanner role with dedicated middleware and permissions
 
-### AI / Chatbot Support
-- Integrated **AI chatbot** for campus queries
+### Chatbot Support
+- Integrated **Chatbot** for campus queries
 - Context-aware responses for navigation, schedules, and FAQs
 
 ### Quiz System
