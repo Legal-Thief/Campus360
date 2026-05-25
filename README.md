@@ -663,12 +663,12 @@ Building Campus360 provided deep hands-on experience with:
 
 ## Contributors
 
-| Name |
-|:--|
-| **Tanishq Patel** |
-| **Udita Singh** |
-| **Tanmai Pahwa** |
-| **Vidita Sharma** |
+| Name | GitHub |
+|:--|:--|
+| **Tanishq Patel** | [@Legal-Thief](https://github.com/Legal-Thief) |
+| **Udita Singh** | [@Udita84](https://github.com/Udita84) |
+| **Tanmai Pahwa** | [@pahwatanmai08](https://github.com/pahwatanmai08) |
+| **Vidita Sharma** | [@viditae0530-dot](https://github.com/viditae0530-dot) |
 
 ---
 
@@ -747,7 +747,7 @@ SOFTWARE.
 
 <br/>
 
-[![GitHub Stars](https://img.shields.io/github/stars/your-username/Campus360?style=social)](https://github.com/your-username/Campus360)
-[![GitHub Forks](https://img.shields.io/github/forks/your-username/Campus360?style=social)](https://github.com/your-username/Campus360/fork)
+[![GitHub Stars](https://img.shields.io/github/stars/Legal-Thief/Campus360?style=social)](https://github.com/Legal-Thief/Campus360)
+[![GitHub Forks](https://img.shields.io/github/forks/Legal-Thief/Campus360?style=social)](https://github.com/Legal-Thief/Campus360/fork)
 
 </div>
